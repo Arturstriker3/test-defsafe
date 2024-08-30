@@ -21,7 +21,9 @@
     "@iconify-json/mdi": "^1.1.68",
     "@nuxtjs/tailwindcss": "^6.12.1",
     "@nuxtjs/vuetify": "^1.12.3",
+    "@types/node": "^22.5.1",
     "prisma": "^5.19.0",
+    "typescript": "^5.5.4",
     "vite-plugin-vuetify": "^2.0.4",
     "vuetify": "^3.7.1"
   }
