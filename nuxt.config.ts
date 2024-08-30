@@ -1,8 +1,37 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
+import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
+
 export default defineNuxtConfig({
+  build: {
+    transpile: ['vuetify'],
+  },
+
   compatibilityDate: '2024-04-03',
   devtools: { enabled: process.env.NODE_ENV === 'development' },
   modules: [
-    '@nuxtjs/tailwindcss'
+    '@nuxtjs/tailwindcss',
+    'nuxt-icon-tw',
+    ['@nuxtjs/google-fonts', {
+      families: {
+        Inter: true,
+      },
+    }],
+    (_options, nuxt) => {
+      nuxt.hooks.hook('vite:extendConfig', (config) => {
+        config.plugins = config.plugins || [];
+        
+        config.plugins.push(
+          vuetify({
+            autoImport: true,
+          })
+        )
+      })
+    },
   ],
+  vite: {
+    vue: {
+      template: {
+        transformAssetUrls,
+      },
+    },
+  },
 })

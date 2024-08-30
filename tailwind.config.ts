@@ -12,6 +12,9 @@ export default {
         danger: '#E03131',
         success: '#08D58B',
       },
+      fontFamily: {
+        sans: ['Inter', 'sans-serif'],
+      },
     },
   },
   plugins: [],

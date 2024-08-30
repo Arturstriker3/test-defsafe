@@ -10,12 +10,19 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@mdi/font": "^7.4.47",
+    "@nuxtjs/google-fonts": "^3.2.0",
     "@prisma/client": "^5.19.0",
     "nuxt": "^3.13.0",
+    "nuxt-icon-tw": "^1.0.0",
     "vue": "latest"
   },
   "devDependencies": {
+    "@iconify-json/mdi": "^1.1.68",
     "@nuxtjs/tailwindcss": "^6.12.1",
-    "prisma": "^5.19.0"
+    "@nuxtjs/vuetify": "^1.12.3",
+    "prisma": "^5.19.0",
+    "vite-plugin-vuetify": "^2.0.4",
+    "vuetify": "^3.7.1"
   }
 }
