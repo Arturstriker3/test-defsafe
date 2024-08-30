@@ -1,8 +1,5 @@
-<!-- pages/index.vue -->
 <script setup>
-definePageMeta({
-  layout: 'default'
-})
+
 </script>
 
 <template>
