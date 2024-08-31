@@ -56,7 +56,6 @@ const submitForm = () => {
                     <v-divider
                         :thickness="2"
                         class="border-opacity-25 max-w-96"
-                        color="error"
                     ></v-divider>
                 </div>
                 <v-sheet class="mx-auto"  maxWidth="400">
@@ -84,7 +83,7 @@ const submitForm = () => {
                             @click:append-inner="passwordVisible = !passwordVisible"
                         ></v-text-field>
                         
-                        <v-btn class="mt-2 bg-main" size="large" type="submit" block color="main">Login</v-btn>
+                        <v-btn @click="submitForm" class="mt-2 bg-main" size="large" type="submit" block color="main">Login</v-btn>
                     </v-form>
                 </v-sheet>
             </div>
