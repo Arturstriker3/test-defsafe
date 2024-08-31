@@ -3,8 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "NODE_ENV=production nuxt build",
-    "dev": "NODE_ENV=development nuxt dev",
+    "build": "cross-env NODE_ENV=production nuxt build",
+    "dev": "cross-env NODE_ENV=development nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
@@ -22,6 +22,7 @@
     "@nuxtjs/tailwindcss": "^6.12.1",
     "@nuxtjs/vuetify": "^1.12.3",
     "@types/node": "^22.5.1",
+    "cross-env": "^7.0.3",
     "prisma": "^5.19.0",
     "typescript": "^5.5.4",
     "vite-plugin-vuetify": "^2.0.4",
