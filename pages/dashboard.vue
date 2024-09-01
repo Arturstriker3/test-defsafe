@@ -43,7 +43,7 @@ const toggleMenu = () => {
                 <nav class="flex-1">
                     <div class="flex flex-row items-center justify-between px-2" >
                         <span class="text-placeholder py-2.5 px-4 my-4">Main Menu</span>
-                        <Icon v-show="menuBtn" @click="toggleMenu()" name="material-symbols:menu" class="icon text-black text-4xl mr-2 cursor-pointer" />
+                        <Icon v-show="menuBtn" @click="toggleMenu()" name="material-symbols:close" class="icon text-black text-4xl mr-2 cursor-pointer" />
                     </div>
                     <a class="menu-item block hover:text-white font-medium py-2.5 px-4 my-4 rounded transition duration-200 hover:bg-gradient-to-r hover:from-main hover:to-main" href="#">
                         <Icon name="solar:cat-bold" class="icon text-4xl mr-2" />
@@ -78,59 +78,98 @@ const toggleMenu = () => {
                 <div class="relative max-w-md w-full">
                     <input class="w-full h-10 pl-10 pr-4 py-1 text-base placeholder-placeholder border rounded-full focus:shadow-outline" type="search" placeholder="Search...">
                 </div>
-                <div class="mt-8 p-4">
-                    <div class="flex flex-row items-center gap-4" >
-                        <div class="rounded-lg h-16 w-16 bg-[#f1f6fc] flex justify-center items-center">
-                            <Icon name="solar:cat-bold" class="text-main text-4xl" />
+                <div class="mt-8">
+                    <div class="flex flex-row items-center justify-between" >
+                        <div class="flex flex-row items-center gap-4">
+                            <div class="rounded-lg h-16 w-16 bg-[#f1f6fc] flex justify-center items-center">
+                                <Icon name="solar:cat-bold" class="text-main text-4xl" />
+                            </div>
+                            <h2 class="text-black text-xl font-semibold">Cat List</h2>
                         </div>
-                        <h2 class="text-black text-xl font-semibold">Cat List</h2>
+                        <v-btn class="mt-2 bg-main" type="submit" color="main">
+                            <p class="hidden md:block">New Cat</p>
+                            <div class="block md:hidden">
+                                <Icon name="mdi-add" class="text-white text-2xl" />
+                            </div>
+                        </v-btn>
                     </div>
-                    <div class="my-10" ></div>
-                    <table class="w-full table-auto text-sm bg-white rounded-2xl">
+                    <div class="my-10" >
+                        <div class="md:hidden flex flex-row gap-2 items-center" >
+                            <Icon name="material-symbols:help" class="text-stroke text-2xl" />
+                            <span class="text-xs text-placeholder font-light">To edit a cat click the image</span>
+                        </div>
+                    </div>
+                    <v-table class="w-full table-auto text-sm bg-white rounded-2xl">
                         <thead>
-                            <tr class="text-sm leading-normal">
-                                <th class="py-2 px-4 bg-grey-lightest font-bold text-sm text-grey-light border-b border-grey-light">Image</th>
-                                <th class="py-2 px-4 bg-grey-lightest font-bold text-sm text-grey-light border-b border-grey-light">Name</th>
-                                <th class="py-2 px-4 bg-grey-lightest font-bold text-sm text-grey-light border-b border-grey-light">Description</th>
+                            <tr class="text-sm leading-normal text-main">
+                                <th class="py-2 px-4 text-base border-b border-grey-light">Image</th>
+                                <th class="py-2 px-4 text-base border-b border-grey-light">Name</th>
+                                <th class="py-2 px-4 text-base border-b border-grey-light">Description</th>
+                                <th class="py-2 px-4 text-base border-b border-grey-light hidden md:table-cell">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr class="hover:bg-grey-lighter">
-                                <td class="py-2 px-4 border-b border-grey-light"><img src="https://via.placeholder.com/40" alt="Foto Perfil" class="rounded-full h-10 w-10"></td>
-                                <td class="py-2 px-4 border-b border-grey-light">Juan Pérez</td>
-                                <td class="py-2 px-4 border-b border-grey-light">Comercio</td>
-                            </tr>
                             <!-- Añade más filas aquí como la anterior para cada autorización pendiente -->
-                            <tr class="hover:bg-grey-lighter">
-                                <td class="py-2 px-4 border-b border-grey-light"><img src="https://via.placeholder.com/40" alt="Foto Perfil" class="rounded-full h-10 w-10"></td>
+                            <tr>
+                                <td class="py-2 px-4 border-b border-grey-light">
+                                    <div class="image-container">
+                                        <img src="https://via.placeholder.com/48" alt="Cat Picture" class="rounded-full h-12 w-12">
+                                        <div class="icon flex justify-center items-center h-12 w-12 rounded-full bg-[#f1f6fc] hover:bg-stroke cursor-pointer">
+                                            <Icon name="mdi-pencil" class="text-main text-2xl" />
+                                        </div>
+                                    </div>
+                                </td>
                                 <td class="py-2 px-4 border-b border-grey-light">María Gómez</td>
                                 <td class="py-2 px-4 border-b border-grey-light">Usuario</td>
-                            </tr>
-                            <tr class="hover:bg-grey-lighter">
-                                <td class="py-2 px-4 border-b border-grey-light"><img src="https://via.placeholder.com/40" alt="Foto Perfil" class="rounded-full h-10 w-10"></td>
-                                <td class="py-2 px-4 border-b border-grey-light">Carlos López</td>
-                                <td class="py-2 px-4 border-b border-grey-light">Usuario</td>
-                            </tr>
-                            <tr class="hover:bg-grey-lighter">
-                                <td class="py-2 px-4 border-b border-grey-light"><img src="https://via.placeholder.com/40" alt="Foto Perfil" class="rounded-full h-10 w-10"></td>
-                                <td class="py-2 px-4 border-b border-grey-light">Laura Torres</td>
-                                <td class="py-2 px-4 border-b border-grey-light">Comercio</td>
-                            </tr>
-                            <tr class="hover:bg-grey-lighter">
-                                <td class="py-2 px-4 border-b border-grey-light"><img src="https://via.placeholder.com/40" alt="Foto Perfil" class="rounded-full h-10 w-10"></td>
-                                <td class="py-2 px-4 border-b border-grey-light">Ana Ramírez</td>
-                                <td class="py-2 px-4 border-b border-grey-light">Usuario</td>
+                                <td class="py-2 px-4 border-b border-grey-light hidden md:table-cell">
+                                    <div class="flex gap-2" >
+                                        <div class="rounded-lg h-8 w-8 bg-[#f1f6fc] hover:bg-stroke flex justify-center items-center cursor-pointer">
+                                            <Icon name="mdi-pencil" class="text-main text-2xl" />
+                                        </div>
+                                        <div class="rounded-lg h-8 w-8 bg-[#fff5f5] hover:bg-stroke flex justify-center items-center cursor-pointer">
+                                            <Icon name="mdi-delete" class="text-danger text-2xl" />
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="border-y border-grey-light table-cell md:hidden">
+                                    <div class="rounded-lg h-8 w-8 bg-[#fff5f5] hover:bg-stroke flex justify-center items-center cursor-pointer">
+                                        <Icon name="mdi-delete" class="text-danger text-2xl" />
+                                    </div>
+                                </td>
                             </tr>
                         </tbody>
-                    </table>
-                    <!-- Botón "Ver más" para la tabla de Autorizaciones Pendientes -->
-                    <div class="text-right mt-4">
-                        <button class="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-2 px-4 rounded">
-                            Ver más
-                        </button>
-                    </div>
+                    </v-table>
                 </div>
             </div>
         </div>
     </div>
 </template>
+
+<style scoped>
+.image-container {
+    position: relative;
+    display: inline-block;
+}
+
+.image-container img {
+    display: block;
+    transition: opacity 0.3s ease;
+}
+
+.image-container .icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.image-container:hover .icon {
+    opacity: 1;
+}
+
+.image-container:hover img {
+    opacity: 0;
+}
+</style>
