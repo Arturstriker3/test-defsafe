@@ -7,7 +7,6 @@ const menuBtn = ref(false)
 
 const toggleMenu = () => {
     menuBtn.value = !menuBtn.value
-    console.log("click")
 }
 
 </script>
@@ -34,10 +33,18 @@ const toggleMenu = () => {
 
         <!-- Contenido principal -->
         <div class="flex-1 flex flex-wrap">
-            <!-- Barra lateral de navegación (oculta en dispositivos pequeños) -->
-            <div class="p-2 bg-white w-full md:w-60 hidden flex-col md:flex" id="sideNav">
-                <nav>
-                    <span class="text-placeholder py-2.5 px-4 my-4">Main Menu</span>
+            <!-- Barra lateral de navegação -->
+            <div
+                class="p-2 bg-white w-full md:w-60 md:flex flex-col fixed md:relative"
+                :class="{ 'hidden': !menuBtn, 'flex': menuBtn, 'md:flex': true }"
+                id="sideNav"
+                style="z-index: 9999; height: 100%; top: 0; left: 0;"
+            >
+                <nav class="flex-1">
+                    <div class="flex flex-row items-center justify-between px-2" >
+                        <span class="text-placeholder py-2.5 px-4 my-4">Main Menu</span>
+                        <Icon v-show="menuBtn" @click="toggleMenu()" name="material-symbols:menu" class="icon text-black text-4xl mr-2 cursor-pointer" />
+                    </div>
                     <a class="menu-item block hover:text-white font-medium py-2.5 px-4 my-4 rounded transition duration-200 hover:bg-gradient-to-r hover:from-main hover:to-main" href="#">
                         <Icon name="solar:cat-bold" class="icon text-4xl mr-2" />
                         <span>Cat List</span>
@@ -47,22 +54,22 @@ const toggleMenu = () => {
                         <span>Test</span>
                     </a>
                 </nav>
-
                 <!-- Ítem de Cerrar Sesión -->
-                <a class="block font-semibold hover:text-white hover:font-medium py-2.5 px-4 my-2 rounded transition duration-200 hover:bg-gradient-to-r hover:from-main hover:to-main mt-auto" href="#">
+                <a
+                    :class="{'mt-auto': !menuBtn, 'mt-0': menuBtn}"
+                    class="block font-semibold hover:text-white hover:font-medium py-2.5 px-4 my-2 rounded transition duration-200 hover:bg-gradient-to-r hover:from-main hover:to-main"
+                    href="#"
+                >
                     <Icon name="material-symbols:logout" class="icon text-3xl mr-2" />
                     <span>Logout</span>
                 </a>
-
                 <!-- Señalador de ubicación -->
                 <v-divider
                     :thickness="3"
                     class="border-opacity-25 max-w-96"
                 ></v-divider>
-
                 <!-- Copyright al final de la navegación lateral -->
                 <p class="mb-1 py-3 text-left text-xs text-main">Copyright CAP@2024</p>
-
             </div>
 
             <!-- Área de contenido principal -->
