@@ -4,9 +4,9 @@
 <!-- Barra de navegación superior -->
 <div class="bg-white text-white shadow w-full p-2 flex items-center justify-between">
     <div class="flex items-center">
-        <div class="flex items-center"> <!-- Mostrado en todos los dispositivos -->
-            <img src="https://www.emprenderconactitud.com/img/POC%20WCS%20(1).png" alt="Logo" class="w-28 h-18 mr-2">
-            <h2 class="font-bold text-xl">Nombre de la Aplicación</h2>
+        <div class="flex items-center gap-2 px-4"> <!-- Mostrado en todos los dispositivos -->
+            <Icon name="ph:cat-fill" class="text-main text-5xl" />
+            <h2 class="text-main font-semibold">Cat Adoption Plataform</h2>
         </div>
         <div class="md:hidden flex items-center"> <!-- Se muestra solo en dispositivos pequeños -->
             <button id="menuBtn">
@@ -30,28 +30,21 @@
 <!-- Contenido principal -->
 <div class="flex-1 flex flex-wrap">
     <!-- Barra lateral de navegación (oculta en dispositivos pequeños) -->
-    <div class="p-2 bg-white w-full md:w-60 flex flex-col md:flex hidden" id="sideNav">
+    <div class="p-2 bg-white w-full md:w-60 hidden flex-col md:flex" id="sideNav">
         <nav>
-            <span class="text-black py-2.5 px-4 my-4" >Main Menu</span>
-            <a class="block hover:text-white font-medium py-2.5 px-4 my-4 rounded transition duration-200 hover:bg-gradient-to-r hover:from-main hover:to-main" href="#">
-                <i class="fas fa-home mr-2"></i>Inicio
+            <span class="text-placeholder py-2.5 px-4 my-4">Main Menu</span>
+            <a class="menu-item block hover:text-white font-medium py-2.5 px-4 my-4 rounded transition duration-200 hover:bg-gradient-to-r hover:from-main hover:to-main" href="#">
+                <Icon name="solar:cat-bold" class="icon text-4xl mr-2" />
+                <span>Cat List</span>
             </a>
-            <a class="block hover:text-white font-medium py-2.5 px-4 my-4 rounded transition duration-200 hover:bg-gradient-to-r hover:from-main hover:to-main" href="#">
-                <i class="fas fa-file-alt mr-2"></i>Autorizaciones
-            </a>
-            <a class="block hover:text-white font-medium py-2.5 px-4 my-4 rounded transition duration-200 hover:bg-gradient-to-r hover:from-main hover:to-main" href="#">
-                <i class="fas fa-users mr-2"></i>Usuarios
-            </a>
-            <a class="block hover:text-white font-medium py-2.5 px-4 my-4 rounded transition duration-200 hover:bg-gradient-to-r hover:from-main hover:to-main" href="#">
-                <i class="fas fa-store mr-2"></i>Comercios
-            </a>
-            <a class="block hover:text-white !important font-medium py-2.5 px-4 my-4 rounded transition duration-200 hover:bg-gradient-to-r hover:from-main hover:to-main" href="#">
-                <i class="fas fa-exchange-alt mr-2"></i>Transacciones
+            <a class="menu-item block hover:text-white font-medium py-2.5 px-4 my-4 rounded transition duration-200 hover:bg-gradient-to-r hover:from-main hover:to-main" href="#">
+                <Icon name="mdi:test-tube" class="icon text-4xl mr-2" />
+                <span>Test</span>
             </a>
         </nav>
 
         <!-- Ítem de Cerrar Sesión -->
-        <a class="block text-black font-semibold py-2.5 px-4 my-2 rounded transition duration-200 hover:bg-gradient-to-r hover:from-placeholder hover:to-placeholder mt-auto" href="#">
+        <a class="block font-semibold hover:text-white hover:font-medium py-2.5 px-4 my-2 rounded transition duration-200 hover:bg-gradient-to-r hover:from-main hover:to-main mt-auto" href="#">
             <i class="fas fa-sign-out-alt mr-2"></i>Cerrar sesión
         </a>
 
@@ -62,7 +55,7 @@
         ></v-divider>
 
         <!-- Copyright al final de la navegación lateral -->
-        <p class="mb-1 px-5 py-3 text-left text-xs text-main">Copyright CAP@2024</p>
+        <p class="mb-1 px-6 py-3 text-left text-xs text-main">Copyright CAP@2024</p>
 
     </div>
 
@@ -70,10 +63,7 @@
     <div class="flex-1 p-4 w-full md:w-1/2 bg-[#fafbfc]">
         <!-- Campo de búsqueda -->
         <div class="relative max-w-md w-full">
-            <div class="absolute top-1 left-2 inline-flex items-center p-2">
-                <i class="fas fa-search text-gray-400"></i>
-            </div>
-            <input class="w-full h-10 pl-10 pr-4 py-1 text-base placeholder-gray-500 border rounded-full focus:shadow-outline" type="search" placeholder="Buscar...">
+            <input class="w-full h-10 pl-10 pr-4 py-1 text-base placeholder-placeholder border rounded-full focus:shadow-outline" type="search" placeholder="Search...">
         </div>
         <div class="mt-8 p-4">
             <div class="flex flex-row items-center gap-4" >

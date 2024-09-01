@@ -6,3 +6,7 @@ body {
     font-family: 'Inter', sans-serif;
     padding: 8px;
 }
+
+.menu-item {
+    color: #4E2096;
+}
