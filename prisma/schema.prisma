@@ -11,4 +11,28 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Cat {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String
+  imageUrl    String?
+  imageFile   Bytes?
+  adopted     Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  adoptions   Adoption[] @relation("CatAdoptions")
+}
+
+model Adoption {
+  id             Int    @id @default(autoincrement())
+  fullName       String
+  email          String
+  phone          String
+  description    String
+  isAgree        Boolean 
+  cat            Cat     @relation("CatAdoptions", fields: [catId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  catId          Int
 }
