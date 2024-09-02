@@ -9,6 +9,7 @@ export default defineNuxtConfig({
   devtools: { enabled: process.env.NODE_ENV === 'development' },
   modules: [
     '@nuxtjs/tailwindcss',
+    '@nuxtjs/supabase',
     'nuxt-icon-tw',
     ['@nuxtjs/google-fonts', {
       families: {
@@ -34,4 +35,13 @@ export default defineNuxtConfig({
       },
     },
   },
+  supabase: {
+    redirectOptions: {
+      login: '/login',
+      callback: '/confirm',
+      include: undefined,
+      exclude: [],
+      cookieRedirect: true,
+    },
+  }
 })
