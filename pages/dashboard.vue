@@ -1,12 +1,24 @@
 
-<script setup >
+<script setup  lang="ts">
 
 import { ref } from 'vue'
+const client = useSupabaseClient()
+const router = useRouter()
 
 const menuBtn = ref(false)
 
 const toggleMenu = () => {
     menuBtn.value = !menuBtn.value
+}
+
+const logout = async () => {
+    try {
+        const { error } = await client.auth.signOut()
+        if(error) throw error
+        router.push('/login')
+    } catch (error) {
+        console.log(error)
+    }
 }
 
 </script>
@@ -59,6 +71,7 @@ const toggleMenu = () => {
                     :class="{'mt-auto': !menuBtn, 'mt-0': menuBtn}"
                     class="block font-semibold hover:text-white hover:font-medium py-2.5 px-4 my-2 rounded transition duration-200 hover:bg-gradient-to-r hover:from-main hover:to-main"
                     href="#"
+                    @click="logout()"
                 >
                     <Icon name="material-symbols:logout" class="icon text-3xl mr-2" />
                     <span>Logout</span>

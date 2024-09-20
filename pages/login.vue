@@ -1,5 +1,12 @@
-<script setup>
+<script setup lang="ts">
+
+definePageMeta({
+    middleware: ['auth']
+})
+
 import { ref } from 'vue'
+const client = useSupabaseClient()
+const router = useRouter()
 
 const payload = ref({
     username: 'admin@admin.com',
@@ -7,20 +14,30 @@ const payload = ref({
 })
 
 const rulesUsername = [
-    value => !!value || 'You must enter a first name.',
-    // Adicione mais regras aqui conforme necessário
+    (value: string) => !!value || 'You must enter a first name.',
+    //
 ]
 
 const rulesPassword = [
-    value => !!value || 'You must enter a password.',
-    // Adicione mais regras aqui conforme necessário
+    (value: string) => !!value || 'You must enter a password.',
+    //
 ]
 
 const passwordVisible = ref(false)
 
-const submitForm = () => {
-    console.log("LOGIN")
+const signIn = async () => {
+    try {
+        const { error } = await client.auth.signInWithPassword({
+            email: payload.value.username,
+            password: payload.value.password
+        })
+        if(error) throw error
+        router.push('/dashboard')
+    } catch (error) {
+        console.log(error)
+    }
 }
+
 </script>
 
 <template>
@@ -83,7 +100,7 @@ const submitForm = () => {
                             @click:append-inner="passwordVisible = !passwordVisible"
                         ></v-text-field>
                         
-                        <v-btn @click="submitForm" class="mt-2 bg-main" size="large" type="submit" block color="main">Login</v-btn>
+                        <v-btn @click="signIn()" class="mt-2 bg-main" size="large" type="submit" block color="main">Login</v-btn>
                     </v-form>
                 </v-sheet>
             </div>
