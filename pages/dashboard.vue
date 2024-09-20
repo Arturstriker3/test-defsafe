@@ -2,6 +2,7 @@
 <script setup  lang="ts">
 
 import { ref } from 'vue'
+import { useRouter } from 'vue-router';
 const client = useSupabaseClient()
 const router = useRouter()
 
@@ -19,6 +20,10 @@ const logout = async () => {
     } catch (error) {
         console.log(error)
     }
+}
+
+const navigateHome = () => {
+    router.push('/')
 }
 
 </script>
@@ -61,7 +66,7 @@ const logout = async () => {
                         <Icon name="solar:cat-bold" class="icon text-4xl mr-2" />
                         <span>Cat List</span>
                     </a>
-                    <a class="menu-item block hover:text-white font-medium py-2.5 px-4 my-4 rounded transition duration-200 hover:bg-gradient-to-r hover:from-main hover:to-main" href="#">
+                    <a @click.prevent="navigateHome" class="menu-item block hover:text-white font-medium py-2.5 px-4 my-4 rounded transition duration-200 hover:bg-gradient-to-r hover:from-main hover:to-main" href="#">
                         <Icon name="mdi:test-tube" class="icon text-4xl mr-2" />
                         <span>Test</span>
                     </a>
