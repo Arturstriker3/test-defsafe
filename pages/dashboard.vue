@@ -41,7 +41,7 @@ const navigateHome = () => {
             <!-- Ícono de Notificación y Perfil -->
             <div class="space-x-5">
                 <div class="md:hidden flex items-center"> <!-- Se muestra solo en dispositivos pequeños -->
-                    <button id="menuBtn" @click="toggleMenu">
+                    <button class="hover:cursor-pointer" id="menuBtn" @click="toggleMenu">
                         <Icon name="material-symbols:menu" class="icon text-black text-4xl mr-2" />
                     </button>
                 </div>
