@@ -5,6 +5,13 @@ export default defineNuxtConfig({
     transpile: ['vuetify'],
   },
 
+  runtimeConfig: {
+    public: {
+      SUPABASE_URL: process.env.SUPABASE_URL,
+      SUPABASE_KEY: process.env.SUPABASE_KEY
+    }
+  },
+
   compatibilityDate: '2024-04-03',
   devtools: { enabled: process.env.NODE_ENV === 'development' },
   modules: [
