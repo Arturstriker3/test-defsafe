@@ -7,6 +7,7 @@ const client = useSupabaseClient()
 const router = useRouter()
 
 const menuBtn = ref(false)
+const isCreatingNewCat = ref(false)
 
 const toggleMenu = () => {
     menuBtn.value = !menuBtn.value
@@ -25,6 +26,33 @@ const logout = async () => {
 const navigateHome = () => {
     router.push('/')
 }
+
+const handleNewCat = () => {
+    isCreatingNewCat.value = !isCreatingNewCat.value
+}
+
+const rulesCatname = [
+    (value: string) => !!value || 'You must enter the cat name.',
+    //
+]
+
+const rulesCatDescription = [
+    (value: string) => !!value || 'You must enter the cat description.',
+    //
+]
+
+const rulesCatImage = [
+    (value: FileList) => !!value.length || 'You must upload the cat image.',
+    (value: FileList) => !value.length || value[0].size < 5000000 || 'Cat image should be less than 5 MB.',
+    (value: FileList) => !value.length || ['image/jpeg', 'image/png'].includes(value[0].type) || 'Cat image must be a .jpeg or .png file.',
+    //
+]
+
+const newCatData = ref({
+    name: '',
+    description: '',
+    imageBase64: ''
+})
 
 </script>
 
@@ -55,7 +83,7 @@ const navigateHome = () => {
                 class="p-2 bg-white w-full md:w-60 md:flex flex-col fixed md:relative"
                 :class="{ 'hidden': !menuBtn, 'flex': menuBtn, 'md:flex': true }"
                 id="sideNav"
-                style="z-index: 9999; height: 100%; top: 0; left: 0;"
+                style="z-index: 1; height: 100%; top: 0; left: 0;"
             >
                 <nav class="flex-1">
                     <div class="flex flex-row items-center justify-between px-2" >
@@ -104,7 +132,7 @@ const navigateHome = () => {
                             </div>
                             <h2 class="text-black text-xl font-semibold">Cat List</h2>
                         </div>
-                        <v-btn class="mt-2 bg-main" type="submit" color="main">
+                        <v-btn @click="handleNewCat()" class="mt-2 bg-main" type="submit" color="main">
                             <p class="hidden md:block">New Cat</p>
                             <div class="block md:hidden">
                                 <Icon name="mdi-add" class="text-white text-2xl" />
@@ -161,6 +189,88 @@ const navigateHome = () => {
             </div>
         </div>
     </div>
+    <v-dialog
+      v-model="isCreatingNewCat"
+      max-width="400"
+    width="400"
+    >
+      <v-card>
+        <v-card-title>
+            <span class="font-semibold">
+                Register New Cat
+            </span>
+        </v-card-title>
+
+        <v-divider
+            :thickness="2"
+            class="border-opacity-50"
+        ></v-divider>
+
+        <div class="p-4" >
+            <v-form @submit.prevent>
+                
+                <span class="text-main font-semibold" >Image</span>
+                <v-file-input
+                    placeholder="URL and Upload"
+                    variant="outlined"
+                    bg-color="white"
+                    prepend-icon=""
+                    append-inner-icon="mdi-camera"
+                    accept="image/png, image/jpeg"
+                    :rules="rulesCatImage"
+                    :clearable="false"
+                    
+                ></v-file-input>       
+
+                <span class="text-main font-semibold" >Name</span>
+                <v-text-field
+                    v-model="newCatData.name"
+                    :rules="rulesCatname"
+                    placeholder="Enter the cat's name"
+                    variant="outlined"
+                    class="mt-2"
+                    :hint="newCatData.name.length + '/30'"
+                    maxlength="30"
+                    persistent-hint
+                ></v-text-field>
+
+                <span class="text-main font-semibold" >Description</span>
+                <v-textarea
+                    v-model="newCatData.description"
+                    placeholder="Write here..."
+                    row-height="25"
+                    rows="3"
+                    no-resize
+                    bg-color="white"
+                    variant="outlined"
+                    :hint="newCatData.description.length + '/100'"
+                    maxlength="100"
+                    persistent-hint
+                    :rules="rulesCatDescription"
+                ></v-textarea>
+
+            </v-form>
+        </div>
+        
+
+        <template v-slot:actions>
+            <v-btn
+                text="Cancel"
+                @click="isCreatingNewCat = false"
+                color="stroke"
+                variant="flat"
+                width="100"
+            ></v-btn>
+            <v-btn
+                text="Save"
+                @click="isCreatingNewCat = false"
+                color="main"
+                variant="flat"
+                width="100"
+            ></v-btn>
+        </template>
+      </v-card>
+    </v-dialog>
 </template>
 
 <style scoped>
