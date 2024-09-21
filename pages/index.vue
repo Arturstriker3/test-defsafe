@@ -54,7 +54,7 @@ const navigateAuth = () => {
 
         <!-- Contenido principal -->
         <div>
-          <div class="mt-8 mb-4 pl-6">
+          <div class="mt-9 mb-6 pl-6">
             <h2 class="text-main text-3xl font-semibold" >Cats for adoption</h2>
             <p class="hidden md:inline" >Explore our list of lovable cats looking for their forever homes.</p>
           </div>
