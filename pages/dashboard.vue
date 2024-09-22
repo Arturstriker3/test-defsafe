@@ -9,13 +9,20 @@ const router = useRouter()
 const menuBtn = ref(false)
 const isLoading = ref(false)
 const isCreatingNewCat = ref(false);
+const isEditingCat = ref(false);
 const cats = ref<Cat[]>([]);
+const catEditData = ref({
+    id: 0,
+    name: '',
+    description: '',
+} as {id:number; name: string; description: string;
+});
 
 export interface Cat {
     id: number;
     name: string;
     description: string;
-    imageUrl: string;
+    imageUrl?: string;
     adopted?: boolean;
     createdAt?: Date;
     updatedAt?: Date;
@@ -145,6 +152,41 @@ onMounted(() => {
   fetchCats();
 });
 
+const handleEditCat = (catId: number, catName: string, catDescription: string) => {
+    isEditingCat.value = true;
+    catEditData.value = {
+        id: catId,
+        name: catName,
+        description: catDescription,
+    }
+}
+
+const updateCat = async (id: number, catNewName: string, catNewDescription: string) => {
+    try {
+        const response = await fetch(`/api/cats/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                name: catNewName,
+                description: catNewDescription,
+            }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`Error updating cat: ${errorData.error}`);
+        } else {
+            fetchCats()
+            isEditingCat.value = false;
+        }
+    } catch (error) {
+        console.error('Error updating cat:', error);
+        throw error;
+    }
+}
+
 </script>
 
 <template>
@@ -248,7 +290,7 @@ onMounted(() => {
                         <tbody>
                             <tr v-for="cat in cats" :key="cat.id">
                                 <td class="py-2 px-4 border-b border-grey-light">
-                                    <div class="image-container">
+                                    <div @click="handleEditCat(cat.id, cat.name, cat.description)" class="image-container">
                                         <img :src="cat.imageUrl" alt="Cat Picture" class="rounded-full h-12 w-12">
                                         <div class="icon flex justify-center items-center h-12 w-12 rounded-full bg-[#f1f6fc] hover:bg-stroke cursor-pointer">
                                             <Icon name="mdi-pencil" class="text-main text-2xl" />
@@ -259,7 +301,7 @@ onMounted(() => {
                                 <td class="py-2 px-4 border-b border-grey-light">{{ cat.description }}</td>
                                 <td class="py-2 px-4 border-b border-grey-light hidden md:table-cell">
                                     <div class="flex gap-2">
-                                        <div class="rounded-lg h-8 w-8 bg-[#f1f6fc] hover:bg-stroke flex justify-center items-center cursor-pointer">
+                                        <div @click="handleEditCat(cat.id, cat.name, cat.description)" class="rounded-lg h-8 w-8 bg-[#f1f6fc] hover:bg-stroke flex justify-center items-center cursor-pointer">
                                             <Icon name="mdi-pencil" class="text-main text-2xl" />
                                         </div>
                                         <div class="rounded-lg h-8 w-8 bg-[#fff5f5] hover:bg-stroke flex justify-center items-center cursor-pointer">
@@ -355,6 +397,72 @@ onMounted(() => {
             <v-btn
                 text="Save"
                 @click="addNewCat()"
+                color="main"
+                variant="flat"
+                width="100"
+            ></v-btn>
+        </template>
+      </v-card>
+    </v-dialog>
+    <v-dialog
+      v-model="isEditingCat"
+      max-width="400"
+    width="400"
+    >
+      <v-card>
+        <v-card-title>
+            <span class="font-semibold">
+                Edit {{ catEditData.name }}
+            </span>
+        </v-card-title>
+
+        <v-divider
+            :thickness="2"
+            class="border-opacity-50"
+        ></v-divider>
+        
+        <div class="p-4" >
+            <v-form @submit.prevent>
+                <span class="text-main font-semibold" >Name</span>
+                <v-text-field
+                    v-model="catEditData.name"
+                    :rules="rulesCatname"
+                    placeholder="Enter the cat's name"
+                    variant="outlined"
+                    class="mt-2"
+                    :hint="catEditData.name.length + '/30'"
+                    maxlength="30"
+                    persistent-hint
+                ></v-text-field>
+
+                <span class="text-main font-semibold" >Description</span>
+                <v-textarea
+                    v-model="catEditData.description"
+                    placeholder="Write here..."
+                    row-height="25"
+                    rows="3"
+                    no-resize
+                    bg-color="white"
+                    variant="outlined"
+                    :hint="catEditData.description.length + '/100'"
+                    maxlength="100"
+                    persistent-hint
+                    :rules="rulesCatDescription"
+                    class="mt-2"
+                ></v-textarea>
+            </v-form>
+        </div>
+        <template v-slot:actions>
+            <v-btn
+                text="Cancel"
+                @click="isEditingCat = false"
+                color="stroke"
+                variant="flat"
+                width="100"
+            ></v-btn>
+            <v-btn
+                text="Save"
+                @click="updateCat(catEditData.id, catEditData.name, catEditData.description)"
                 color="main"
                 variant="flat"
                 width="100"
