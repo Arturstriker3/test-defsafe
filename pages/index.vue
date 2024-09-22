@@ -3,15 +3,8 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router';
 import EmailUtils from '@/utils/email.utils';
-import PhoneUtils from '@/utils/phone.utils';
 
 const router = useRouter()
-
-const notify = () => {
-  useNuxtApp().$toast.info('toastify success');
-  // or
-  // toast.info('toastify success');
-};
 
 const isMobile = ref(false);
 
@@ -171,6 +164,7 @@ const sendAdoptionForm = async (catId: number) => {
     if (response.ok) {
       isAdoptingCat.value = false;
       useNuxtApp().$toast.success('Adoption form sent successfully');
+      adoptionConfirmModal.value = true;
       await fetchCats();
     } else {
       console.error('Erro ao enviar formulário de adoção:', result.error);
@@ -180,6 +174,9 @@ const sendAdoptionForm = async (catId: number) => {
     console.error('Erro ao enviar formulário de adoção:', error);
   }
 };
+
+const adoptionConfirmModal = ref(false);
+
 
 </script>
 
@@ -353,13 +350,48 @@ const sendAdoptionForm = async (catId: number) => {
                     text="Submit"
                     @click="sendAdoptionForm(catIdToAdopt)"
                     color="main"
-                    variant="flat"
                     width="100"
+                    variant="flat"
                 ></v-btn>
               </div>
             </template>
           </v-card>
         </v-dialog>
+        <v-dialog
+      v-model="adoptionConfirmModal"
+      max-width="400"
+    width="400"
+    >
+      <v-card>
+        <v-card-title>
+            <div class="flex flex-row justify-between items-center" >
+                <span class="font-semibold">
+                  Application Submitted!
+                </span>
+                <div class="rounded-lg h-8 w-8 bg-[#b2f2e055] hover:bg-stroke flex justify-center items-center">
+                    <Icon name="mdi-check" class="text-success text-2xl" />
+                </div>
+            </div>
+        </v-card-title>
+
+        <v-divider
+            :thickness="2"
+            class="border-opacity-50"
+        ></v-divider>
+        <v-card-text>
+            <span class="">Thank you for submitting your adoption application! Our team will review your application and get back to you shortly.</span>
+        </v-card-text>
+        <template v-slot:actions>
+            <v-btn
+                text="Close"
+                @click="adoptionConfirmModal = false"
+                color="main"
+                block
+                variant="flat"
+            ></v-btn>
+        </template>
+      </v-card>
+    </v-dialog>
     </div>
 </template>
 
