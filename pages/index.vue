@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router';
 const router = useRouter()
 
@@ -14,17 +14,45 @@ const navigateAuth = () => {
     router.push('/login')
 }
 
+const cats = ref<Cat[]>([]);
+
+export interface Cat {
+    id: number;
+    name: string;
+    description: string;
+    imageUrl: string;
+    adopted?: boolean;
+    createdAt?: Date;
+    updatedAt?: Date;
+}
+
+const fetchCats = async () => {
+  try {
+    const response = await fetch('/api/cats', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const result = await response.json();
+    if (response.ok) {
+      cats.value = result.body;
+    } else {
+      console.error('Erro ao buscar gatos:', result.error);
+    }
+  } catch (error) {
+    console.error('Erro ao buscar gatos:', error);
+  }
+};
+
+onMounted(() => {
+  fetchCats();
+});
+
 </script>
 
 <template>
-  <!-- <div>
-    <h1>Bem-vindo à Página Inicial</h1>
-    <Icon name="🚀" />
-    <v-btn @click="notify">
-      Button
-    </v-btn>
-  </div> -->
-
   <div class="flex flex-col h-screen">
     <!-- Barra de navegación superior -->
         <div class="bg-white text-white  w-full p-2 flex items-center justify-between">
@@ -60,69 +88,34 @@ const navigateAuth = () => {
           </div>
 
           <div class="mx-0 w-screen justify-items-center justify-between gap-y-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mb-10" >
-            <v-card
+            <div v-for="cat in cats" :key="cat.id">
+              <v-card
               max-width="300"
               max-height="400"
               height="400"
               width="300"
-            >
+              >
               <div class="rounded-3xl p-5">
                 <v-img
-                  height="180px"
-                  src="https://cdn.vuetifyjs.com/images/cards/sunshine.jpg"
-                  cover
-                  class="rounded-lg"
+                height="180px"
+                :src="cat.imageUrl"
+                cover
+                class="rounded-lg"
                 ></v-img>
               </div>
               <v-card-title>
                 <span class="font-semibold">
-                  Top western road trips
-                </span>
-              </v-card-title>
-              <v-card-text class="text-limited" >
-                <p>
-                  Lorem ipsum dolor sit amet
-                </p>
-              </v-card-text>
-              <v-card-actions>
-                <div class="px-1 w-full" >
-                  <v-btn
-                  color="main"
-                  variant="flat"
-                  text="Adopt"
-                  block
-                  ></v-btn>
-                </div>
-              </v-card-actions>
-            </v-card>
-
-            <v-card
-              max-width="300"
-              max-height="400"
-              height="400"
-              width="300"
-            >
-              <div class="rounded-3xl p-5">
-                <v-img
-                  height="180px"
-                  src="https://cdn.vuetifyjs.com/images/cards/sunshine.jpg"
-                  cover
-                  class="rounded-lg"
-                ></v-img>
-              </div>
-              <v-card-title>
-                <span class="font-semibold">
-                  Top western road trips
+                {{ cat.name }}
                 </span>
               </v-card-title>
               <v-card-text class="text-limited">
                 <p>
-                  Lorem ipsum dolor sit amet, Lorem ipsum dolor sit amet, Lorem ipsum dolor sit amet, Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet, Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet, Lorem ipsum dolor sit amet,
+                {{ cat.description }}
                 </p>
               </v-card-text>
               <v-card-actions>
-                <div class="px-1 w-full" >
-                  <v-btn
+                <div class="px-1 w-full">
+                <v-btn
                   color="main"
                   variant="flat"
                   text="Adopt"
@@ -130,115 +123,8 @@ const navigateAuth = () => {
                 ></v-btn>
                 </div>
               </v-card-actions>
-            </v-card>
-
-            <v-card
-              max-width="300"
-              max-height="400"
-              height="400"
-              width="300"
-            >
-              <div class="rounded-3xl p-5">
-                <v-img
-                  height="180px"
-                  src="https://cdn.vuetifyjs.com/images/cards/sunshine.jpg"
-                  cover
-                  class="rounded-lg"
-                ></v-img>
-              </div>
-              <v-card-title>
-                <span class="font-semibold">
-                  Top western road trips
-                </span>
-              </v-card-title>
-              <v-card-text class="text-limited" >
-                <p>
-                  Lorem ipsum dolor sit amet
-                </p>
-              </v-card-text>
-              <v-card-actions>
-                <div class="px-1 w-full" >
-                  <v-btn
-                  color="main"
-                  variant="flat"
-                  text="Adopt"
-                  block
-                  ></v-btn>
-                </div>
-              </v-card-actions>
-            </v-card>
-
-            <v-card
-              max-width="300"
-              max-height="400"
-              height="400"
-              width="300"
-            >
-              <div class="rounded-3xl p-5">
-                <v-img
-                  height="180px"
-                  src="https://cdn.vuetifyjs.com/images/cards/sunshine.jpg"
-                  cover
-                  class="rounded-lg"
-                ></v-img>
-              </div>
-              <v-card-title>
-                <span class="font-semibold">
-                  Top western road trips
-                </span>
-              </v-card-title>
-              <v-card-text class="text-limited" >
-                <p>
-                  Lorem ipsum dolor sit amet
-                </p>
-              </v-card-text>
-              <v-card-actions>
-                <div class="px-1 w-full" >
-                  <v-btn
-                  color="main"
-                  variant="flat"
-                  text="Adopt"
-                  block
-                  ></v-btn>
-                </div>
-              </v-card-actions>
-            </v-card>
-
-            <v-card
-              max-width="300"
-              max-height="400"
-              height="400"
-              width="300"
-            >
-              <div class="rounded-3xl p-5">
-                <v-img
-                  height="180px"
-                  src="https://cdn.vuetifyjs.com/images/cards/sunshine.jpg"
-                  cover
-                  class="rounded-lg"
-                ></v-img>
-              </div>
-              <v-card-title>
-                <span class="font-semibold">
-                  Top western road trips
-                </span>
-              </v-card-title>
-              <v-card-text class="text-limited" >
-                <p>
-                  Lorem ipsum dolor sit amet
-                </p>
-              </v-card-text>
-              <v-card-actions>
-                <div class="px-1 w-full" >
-                  <v-btn
-                  color="main"
-                  variant="flat"
-                  text="Adopt"
-                  block
-                  ></v-btn>
-                </div>
-              </v-card-actions>
-            </v-card>
+              </v-card>
+            </div>
           </div>
         </div>
     </div>

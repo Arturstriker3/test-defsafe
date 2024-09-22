@@ -1,13 +1,25 @@
 
 <script setup  lang="ts">
 
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router';
 const client = useSupabaseClient()
 const router = useRouter()
 
 const menuBtn = ref(false)
-const isCreatingNewCat = ref(false)
+const isLoading = ref(false)
+const isCreatingNewCat = ref(false);
+const cats = ref<Cat[]>([]);
+
+export interface Cat {
+    id: number;
+    name: string;
+    description: string;
+    imageUrl: string;
+    adopted?: boolean;
+    createdAt?: Date;
+    updatedAt?: Date;
+}
 
 const toggleMenu = () => {
     menuBtn.value = !menuBtn.value
@@ -107,6 +119,31 @@ const addNewCat = async () => {
         console.error('Error:', error);
     }
 };
+
+// Função para buscar gatos da API
+const fetchCats = async () => {
+  try {
+    const response = await fetch('/api/cats', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const result = await response.json();
+    if (response.ok) {
+      cats.value = result.body;
+    } else {
+      console.error('Erro ao buscar gatos:', result.error);
+    }
+  } catch (error) {
+    console.error('Erro ao buscar gatos:', error);
+  }
+};
+
+onMounted(() => {
+  fetchCats();
+});
 
 </script>
 
@@ -209,20 +246,19 @@ const addNewCat = async () => {
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- Añade más filas aquí como la anterior para cada autorización pendiente -->
-                            <tr>
+                            <tr v-for="cat in cats" :key="cat.id">
                                 <td class="py-2 px-4 border-b border-grey-light">
                                     <div class="image-container">
-                                        <img src="https://via.placeholder.com/48" alt="Cat Picture" class="rounded-full h-12 w-12">
+                                        <img :src="cat.imageUrl" alt="Cat Picture" class="rounded-full h-12 w-12">
                                         <div class="icon flex justify-center items-center h-12 w-12 rounded-full bg-[#f1f6fc] hover:bg-stroke cursor-pointer">
                                             <Icon name="mdi-pencil" class="text-main text-2xl" />
                                         </div>
                                     </div>
                                 </td>
-                                <td class="py-2 px-4 border-b border-grey-light">María Gómez</td>
-                                <td class="py-2 px-4 border-b border-grey-light">Usuario</td>
+                                <td class="py-2 px-4 border-b border-grey-light">{{ cat.name }}</td>
+                                <td class="py-2 px-4 border-b border-grey-light">{{ cat.description }}</td>
                                 <td class="py-2 px-4 border-b border-grey-light hidden md:table-cell">
-                                    <div class="flex gap-2" >
+                                    <div class="flex gap-2">
                                         <div class="rounded-lg h-8 w-8 bg-[#f1f6fc] hover:bg-stroke flex justify-center items-center cursor-pointer">
                                             <Icon name="mdi-pencil" class="text-main text-2xl" />
                                         </div>
