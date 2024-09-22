@@ -1,47 +1,39 @@
-import { PrismaClient } from '@prisma/client'
-import { createClient } from '@supabase/supabase-js'
-import sharp from 'sharp';
+import { PrismaClient } from "@prisma/client";
+import { createClient } from "@supabase/supabase-js";
+import sharp from "sharp";
 
-// Configurar Supabase
-const supabaseUrl = process.env.SUPABASE_URL || ''
-const supabaseKey = process.env.SUPABASE_KEY || ''
-const supabase = createClient(supabaseUrl, supabaseKey)
+const supabaseUrl = process.env.SUPABASE_URL || "";
+const supabaseKey = process.env.SUPABASE_KEY || "";
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 if (!supabaseUrl || !supabaseKey) {
-  throw new Error('Variáveis SUPABASE_URL e SUPABASE_KEY são obrigatórias.')
+  throw new Error("Variáveis SUPABASE_URL e SUPABASE_KEY são obrigatórias.");
 }
 
 export default defineEventHandler(async (event) => {
-
-  const prisma = new PrismaClient()
+  const prisma = new PrismaClient();
 
   try {
-    const body = await readBody(event) // Leitura dos dados da requisição
-    const { name, description, imageFile } = body // Extrair os dados recebidos
-    
-    // Verificar se o arquivo foi enviado
-    
+    const body = await readBody(event);
+    const { name, description, imageFile } = body;
+
     if (!imageFile) {
       return {
         status: 400,
-        message: 'Imagem é necessária para cadastrar o gato.'
-      }
+        message: "Imagem é necessária para cadastrar o gato.",
+      };
     }
 
-    // Criar um nome único para a imagem
-    const imageName = `cat-${body.name}.jpg`
+    const imageName = `cat-${body.name}.jpg`;
 
-    const imageData = imageFile.split(',')[1]; // Remove o prefixo se necessário
-    const buffer = Buffer.from(imageData, 'base64');
+    const imageData = imageFile.split(",")[1];
+    const buffer = Buffer.from(imageData, "base64");
 
     try {
-      const transformedBuffer = await sharp(buffer)
-        .toFormat('jpg')
-        .toBuffer();
+      const transformedBuffer = await sharp(buffer).toFormat("jpg").toBuffer();
 
-      const { data, error } = await supabase
-        .storage
-        .from('cats')
+      const { data, error } = await supabase.storage
+        .from("cats")
         .upload(imageName, transformedBuffer);
 
       if (error) {
@@ -51,32 +43,28 @@ export default defineEventHandler(async (event) => {
       console.error(error);
     }
 
-    // Obter a URL pública da imagem
-    const { data: { publicUrl }} = supabase
-      .storage
-      .from('cats')
-      .getPublicUrl(imageName)
-    
-    // Salvar o gato no banco de dados via Prisma
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from("cats").getPublicUrl(imageName);
+
     const newCat = await prisma.cat.create({
       data: {
         name,
         description,
-        imageUrl: publicUrl // Guardar a URL pública da imagem
-      }
-    })
+        imageUrl: publicUrl,
+      },
+    });
 
-    // Retornar o novo gato como resposta
     return {
       status: 200,
-      body: newCat
-    }
+      body: newCat,
+    };
   } catch (error) {
     return {
       status: 500,
-      body: { error: (error as Error).message }
-    }
+      body: { error: (error as Error).message },
+    };
   } finally {
-    await prisma.$disconnect()
+    await prisma.$disconnect();
   }
-})
+});

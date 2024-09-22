@@ -1,5 +1,4 @@
-
-<script setup  lang="ts">
+<script setup lang="ts">
 
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router';
@@ -17,7 +16,8 @@ const catEditData = ref({
     id: 0,
     name: '',
     description: '',
-} as {id:number; name: string; description: string;
+} as {
+    id: number; name: string; description: string;
 });
 
 export interface Cat {
@@ -35,10 +35,10 @@ const toggleMenu = () => {
 }
 
 const logout = async () => {
-    if(!isLoadingView.value || !isActionLoading.value) {
+    if (!isLoadingView.value || !isActionLoading.value) {
         try {
             const { error } = await client.auth.signOut()
-            if(error) throw error
+            if (error) throw error
             router.push('/login')
         } catch (error) {
             console.log(error)
@@ -47,7 +47,7 @@ const logout = async () => {
 }
 
 const navigateHome = () => {
-    if(isLoadingView.value || isActionLoading.value) {
+    if (isLoadingView.value || isActionLoading.value) {
         return
     } else {
         router.push('/')
@@ -141,31 +141,31 @@ const fetchCats = async () => {
 
     isLoadingView.value = true;
 
-  try {
-    const response = await fetch('/api/cats', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    try {
+        const response = await fetch('/api/cats', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
 
-    const result = await response.json();
-    if (response.ok) {
-      cats.value = result.body;
-    } else {
-      console.error('Erro ao buscar gatos:', result.error);
-      useNuxtApp().$toast.error('Error loading cats')
+        const result = await response.json();
+        if (response.ok) {
+            cats.value = result.body;
+        } else {
+            console.error('Erro ao buscar gatos:', result.error);
+            useNuxtApp().$toast.error('Error loading cats')
+        }
+    } catch (error) {
+        console.error('Erro ao buscar gatos:', error);
+    } finally {
+        isLoadingView.value = false;
     }
-  } catch (error) {
-    console.error('Erro ao buscar gatos:', error);
-  } finally {
-    isLoadingView.value = false;
-  }
 };
 
 onMounted(() => {
     isLoadingView.value = true;
-  fetchCats();
+    fetchCats();
 });
 
 const handleEditCat = (catId: number, catName: string, catDescription: string) => {
@@ -262,7 +262,7 @@ const catIdToAdoptLock = ref(0);
 
 const catAdoptLock = async (id: number) => {
 
-isActionLoading.value = true;
+    isActionLoading.value = true;
 
     try {
         const response = await fetch(`/api/cats/${id}/adopted`, {
@@ -347,41 +347,36 @@ const getRandomCatNameService = async () => {
         </div>
 
         <div class="flex-1 flex flex-wrap">
-            <div
-                class="p-2 bg-white w-full md:w-60 md:flex flex-col fixed md:relative"
-                :class="{ 'hidden': !menuBtn, 'flex': menuBtn, 'md:flex': true }"
-                id="sideNav"
-                style="z-index: 1; height: 100%; top: 0; left: 0;"
-            >
+            <div class="p-2 bg-white w-full md:w-60 md:flex flex-col fixed md:relative"
+                :class="{ 'hidden': !menuBtn, 'flex': menuBtn, 'md:flex': true }" id="sideNav"
+                style="z-index: 1; height: 100%; top: 0; left: 0;">
                 <nav class="flex-1">
-                    <div class="flex flex-row items-center justify-between px-2" >
+                    <div class="flex flex-row items-center justify-between px-2">
                         <span class="text-placeholder py-2.5 px-4 my-4">Main Menu</span>
-                        <Icon v-show="menuBtn" @click="toggleMenu()" name="material-symbols:close" class="icon text-black text-4xl mr-2 cursor-pointer" />
+                        <Icon v-show="menuBtn" @click="toggleMenu()" name="material-symbols:close"
+                            class="icon text-black text-4xl mr-2 cursor-pointer" />
                     </div>
-                    <a class="menu-item block hover:text-white font-medium py-2.5 px-4 my-4 rounded transition duration-200 hover:bg-gradient-to-r hover:from-main hover:to-main" href="#">
+                    <a class="menu-item block hover:text-white font-medium py-2.5 px-4 my-4 rounded transition duration-200 hover:bg-gradient-to-r hover:from-main hover:to-main"
+                        href="#">
                         <Icon name="solar:cat-bold" class="icon text-4xl mr-2" />
                         <span>Cat List</span>
                     </a>
-                    <a @click.prevent="navigateHome" class="menu-item block hover:text-white font-medium py-2.5 px-4 my-4 rounded transition duration-200 hover:bg-gradient-to-r hover:from-main hover:to-main" href="#">
+                    <a @click.prevent="navigateHome"
+                        class="menu-item block hover:text-white font-medium py-2.5 px-4 my-4 rounded transition duration-200 hover:bg-gradient-to-r hover:from-main hover:to-main"
+                        href="#">
                         <Icon name="mdi:pets" class="icon text-4xl mr-2" />
                         <span>Adoption List</span>
                     </a>
                 </nav>
 
-                <a
-                    :class="{'mt-auto': !menuBtn, 'mt-0': menuBtn}"
+                <a :class="{ 'mt-auto': !menuBtn, 'mt-0': menuBtn }"
                     class="block font-semibold hover:text-white hover:font-medium py-2.5 px-4 my-2 rounded transition duration-200 hover:bg-gradient-to-r hover:from-main hover:to-main"
-                    href="#"
-                    @click="logout()"
-                >
+                    href="#" @click="logout()">
                     <Icon name="material-symbols:logout" class="icon text-3xl mr-2" />
                     <span>Logout</span>
                 </a>
 
-                <v-divider
-                    :thickness="3"
-                    class="border-opacity-25 max-w-96"
-                ></v-divider>
+                <v-divider :thickness="3" class="border-opacity-25 max-w-96"></v-divider>
 
                 <p class="mb-1 py-3 text-left text-xs text-main">Copyright CAP@2024</p>
             </div>
@@ -390,25 +385,28 @@ const getRandomCatNameService = async () => {
             <div class="flex-1 p-4 w-full md:w-1/2 bg-[#fafbfc]">
 
                 <div class="relative max-w-md w-full">
-                    <input v-model="searchQuery" :disabled="isLoadingView || isActionLoading" class="w-full h-10 pl-10 pr-4 py-1 text-base placeholder-placeholder border rounded-full focus:shadow-outline" type="search" placeholder="Search...">
+                    <input v-model="searchQuery" :disabled="isLoadingView || isActionLoading"
+                        class="w-full h-10 pl-10 pr-4 py-1 text-base placeholder-placeholder border rounded-full focus:shadow-outline"
+                        type="search" placeholder="Search...">
                 </div>
                 <div class="mt-8">
-                    <div class="flex flex-row items-center justify-between" >
+                    <div class="flex flex-row items-center justify-between">
                         <div :disabled="isLoadingView || isActionLoading" class="flex flex-row items-center gap-4">
                             <div class="rounded-lg h-16 w-16 bg-[#f1f6fc] flex justify-center items-center">
                                 <Icon name="solar:cat-bold" class="text-main text-4xl" />
                             </div>
                             <h2 class="text-black text-xl font-semibold">Cat List</h2>
                         </div>
-                        <v-btn :disabled="isLoadingView || isActionLoading" @click="handleNewCat()" class="mt-2 bg-main" type="submit" color="main">
+                        <v-btn :disabled="isLoadingView || isActionLoading" @click="handleNewCat()" class="mt-2 bg-main"
+                            type="submit" color="main">
                             <p class="hidden md:block">New Cat</p>
                             <div class="block md:hidden">
                                 <Icon name="mdi-add" class="text-white text-2xl" />
                             </div>
                         </v-btn>
                     </div>
-                    <div class="my-10" >
-                        <div class="md:hidden flex flex-row gap-2 items-center" >
+                    <div class="my-10">
+                        <div class="md:hidden flex flex-row gap-2 items-center">
                             <Icon name="material-symbols:help" class="text-stroke text-2xl" />
                             <span class="text-xs text-placeholder font-light">To edit a cat, click its image.</span>
                         </div>
@@ -419,15 +417,20 @@ const getRandomCatNameService = async () => {
                                 <th class="py-2 px-4 text-base border-b border-grey-light">Image</th>
                                 <th class="py-2 px-4 text-base border-b border-grey-light">Name</th>
                                 <th class="py-2 px-4 text-base border-b border-grey-light">Description</th>
-                                <th class="py-2 px-4 text-base border-b border-grey-light hidden md:table-cell">Actions</th>
+                                <th class="py-2 px-4 text-base border-b border-grey-light hidden md:table-cell">Actions
+                                </th>
                             </tr>
                         </thead>
-                        <tbody v-if="!isLoadingView && !isActionLoading" >
-                            <tr v-for="cat in filteredCats" :key="cat.id" :class="{'bg-green-50': !cat.adopted, 'bg-red-50': cat.adopted}">
+                        <tbody v-if="!isLoadingView && !isActionLoading">
+                            <tr v-for="cat in filteredCats" :key="cat.id"
+                                :class="{ 'bg-green-50': !cat.adopted, 'bg-red-50': cat.adopted }">
                                 <td class="py-2 px-4 border-b border-grey-light">
-                                    <div @click="handleEditCat(cat.id, cat.name, cat.description)" class="image-container">
-                                        <img :src="cat.imageUrl" alt="Cat Picture" class="rounded-full h-12 w-12 cursor-pointer">
-                                        <div class="icon flex justify-center items-center h-12 w-12 rounded-full bg-[#f1f6fc] hover:bg-stroke cursor-pointer">
+                                    <div @click="handleEditCat(cat.id, cat.name, cat.description)"
+                                        class="image-container">
+                                        <img :src="cat.imageUrl" alt="Cat Picture"
+                                            class="rounded-full h-12 w-12 cursor-pointer">
+                                        <div
+                                            class="icon flex justify-center items-center h-12 w-12 rounded-full bg-[#f1f6fc] hover:bg-stroke cursor-pointer">
                                             <Icon name="mdi-pencil" class="text-main text-2xl" />
                                         </div>
                                     </div>
@@ -437,24 +440,29 @@ const getRandomCatNameService = async () => {
                                 <td class="py-2 px-4 border-b border-grey-light hidden md:table-cell">
                                     <div class="flex gap-2">
                                         <div>
-                                            <div v-if="cat.adopted" @click="handleLockCatAdoption(cat.id)" class="rounded-lg h-8 w-8 bg-[#b2f2e055] hover:bg-stroke flex justify-center items-center cursor-pointer">
+                                            <div v-if="cat.adopted" @click="handleLockCatAdoption(cat.id)"
+                                                class="rounded-lg h-8 w-8 bg-[#b2f2e055] hover:bg-stroke flex justify-center items-center cursor-pointer">
                                                 <Icon name="mdi-unlocked" class="text-success text-2xl" />
                                             </div>
-                                            <div v-else @click="handleLockCatAdoption(cat.id)" class="rounded-lg h-8 w-8 bg-[#b2f2e055] hover:bg-stroke flex justify-center items-center cursor-pointer">
+                                            <div v-else @click="handleLockCatAdoption(cat.id)"
+                                                class="rounded-lg h-8 w-8 bg-[#b2f2e055] hover:bg-stroke flex justify-center items-center cursor-pointer">
                                                 <Icon name="mdi:lock" class="text-danger text-2xl" />
                                             </div>
                                         </div>
-                                        
-                                        <div @click="handleEditCat(cat.id, cat.name, cat.description)" class="rounded-lg h-8 w-8 bg-[#f1f6fc] hover:bg-stroke flex justify-center items-center cursor-pointer">
+
+                                        <div @click="handleEditCat(cat.id, cat.name, cat.description)"
+                                            class="rounded-lg h-8 w-8 bg-[#f1f6fc] hover:bg-stroke flex justify-center items-center cursor-pointer">
                                             <Icon name="mdi-pencil" class="text-main text-2xl" />
                                         </div>
-                                        <div @click="handleDeleteCat(cat.id)"class="rounded-lg h-8 w-8 bg-[#fff5f5] hover:bg-stroke flex justify-center items-center cursor-pointer">
+                                        <div @click="handleDeleteCat(cat.id)"
+                                            class="rounded-lg h-8 w-8 bg-[#fff5f5] hover:bg-stroke flex justify-center items-center cursor-pointer">
                                             <Icon name="mdi-delete" class="text-danger text-2xl" />
                                         </div>
                                     </div>
                                 </td>
                                 <td class="border-y border-grey-light table-cell md:hidden">
-                                    <div @click="handleDeleteCat(cat.id)" class="rounded-lg h-8 w-8 bg-[#fff5f5] hover:bg-stroke flex justify-center items-center cursor-pointer">
+                                    <div @click="handleDeleteCat(cat.id)"
+                                        class="rounded-lg h-8 w-8 bg-[#fff5f5] hover:bg-stroke flex justify-center items-center cursor-pointer">
                                         <Icon name="mdi-delete" class="text-danger text-2xl" />
                                     </div>
                                 </td>
@@ -468,220 +476,118 @@ const getRandomCatNameService = async () => {
             </div>
         </div>
     </div>
-    <v-dialog
-      v-model="isCreatingNewCat"
-      max-width="400"
-    width="400"
-    >
-      <v-card>
-        <v-card-title>
-            <div class="flex flex-row justify-between items-center" >
-                <span class="font-semibold">
-                    Register New Cat
-                </span>
-                <div @click="getRandomCatNameService()" class="rounded-lg h-8 w-8 bg-[#f1f6fc] hover:bg-stroke flex justify-center items-center cursor-pointer">
-                    <Icon name="fad:random-1dice" class="text-main text-2xl" />
+    <v-dialog v-model="isCreatingNewCat" max-width="400" width="400">
+        <v-card>
+            <v-card-title>
+                <div class="flex flex-row justify-between items-center">
+                    <span class="font-semibold">
+                        Register New Cat
+                    </span>
+                    <div @click="getRandomCatNameService()"
+                        class="rounded-lg h-8 w-8 bg-[#f1f6fc] hover:bg-stroke flex justify-center items-center cursor-pointer">
+                        <Icon name="fad:random-1dice" class="text-main text-2xl" />
+                    </div>
                 </div>
+            </v-card-title>
+
+            <v-divider :thickness="2" class="border-opacity-50"></v-divider>
+
+            <div class="p-4">
+                <v-form @submit.prevent>
+
+                    <span class="text-main font-semibold">Image</span>
+                    <v-file-input placeholder="URL and Upload" variant="outlined" bg-color="white" prepend-icon=""
+                        append-inner-icon="mdi-camera" accept="image/png, image/jpeg" :rules="rulesCatImage"
+                        :clearable="false" class="mt-2" @change="handleFileChange"
+                        :disabled="isLoadingView || isActionLoading"></v-file-input>
+
+                    <span class="text-main font-semibold">Name</span>
+                    <v-text-field v-model="newCatData.name" :rules="rulesCatname" placeholder="Enter the cat's name"
+                        variant="outlined" class="mt-2" :hint="newCatData.name.length + '/30'" maxlength="30"
+                        persistent-hint :disabled="isLoadingView || isActionLoading"></v-text-field>
+
+                    <span class="text-main font-semibold">Description</span>
+                    <v-textarea v-model="newCatData.description" placeholder="Write here..." row-height="25" rows="3"
+                        no-resize bg-color="white" variant="outlined" :hint="newCatData.description.length + '/100'"
+                        maxlength="100" persistent-hint :rules="rulesCatDescription" class="mt-2"
+                        :disabled="isLoadingView || isActionLoading"></v-textarea>
+                </v-form>
             </div>
-        </v-card-title>
 
-        <v-divider
-            :thickness="2"
-            class="border-opacity-50"
-        ></v-divider>
-        
-        <div class="p-4" >
-            <v-form @submit.prevent>
-                
-                <span class="text-main font-semibold" >Image</span>
-                <v-file-input
-                    placeholder="URL and Upload"
-                    variant="outlined"
-                    bg-color="white"
-                    prepend-icon=""
-                    append-inner-icon="mdi-camera"
-                    accept="image/png, image/jpeg"
-                    :rules="rulesCatImage"
-                    :clearable="false"
-                    class="mt-2"
-                    @change="handleFileChange"
-                    :disabled="isLoadingView || isActionLoading"
-                ></v-file-input>
 
-                <span class="text-main font-semibold" >Name</span>
-                <v-text-field
-                    v-model="newCatData.name"
-                    :rules="rulesCatname"
-                    placeholder="Enter the cat's name"
-                    variant="outlined"
-                    class="mt-2"
-                    :hint="newCatData.name.length + '/30'"
-                    maxlength="30"
-                    persistent-hint
-                    :disabled="isLoadingView || isActionLoading"
-                ></v-text-field>
-
-                <span class="text-main font-semibold" >Description</span>
-                <v-textarea
-                    v-model="newCatData.description"
-                    placeholder="Write here..."
-                    row-height="25"
-                    rows="3"
-                    no-resize
-                    bg-color="white"
-                    variant="outlined"
-                    :hint="newCatData.description.length + '/100'"
-                    maxlength="100"
-                    persistent-hint
-                    :rules="rulesCatDescription"
-                    class="mt-2"
-                    :disabled="isLoadingView || isActionLoading"
-                ></v-textarea>
-            </v-form>
-        </div>
-        
-
-        <template v-slot:actions>
-            <v-btn
-                text="Cancel"
-                @click="isCreatingNewCat = false"
-                color="stroke"
-                variant="flat"
-                width="100"
-                :disabled="isLoadingView || isActionLoading"
-            ></v-btn>
-            <v-btn
-                text="Save"
-                @click="addNewCat()"
-                color="main"
-                variant="flat"
-                width="100"
-                :disabled="isLoadingView || isActionLoading"
-            ></v-btn>
-        </template>
-      </v-card>
+            <template v-slot:actions>
+                <v-btn text="Cancel" @click="isCreatingNewCat = false" color="stroke" variant="flat" width="100"
+                    :disabled="isLoadingView || isActionLoading"></v-btn>
+                <v-btn text="Save" @click="addNewCat()" color="main" variant="flat" width="100"
+                    :disabled="isLoadingView || isActionLoading"></v-btn>
+            </template>
+        </v-card>
     </v-dialog>
-    <v-dialog
-      v-model="isEditingCat"
-      max-width="400"
-    width="400"
-    >
-      <v-card>
-        <v-card-title>
-            <div class="flex flex-row justify-between items-center" >
-                <span class="font-semibold">
-                    Edit {{ catEditData.name }}
-                </span>
-                <div class="rounded-lg h-8 w-8 bg-[#f1f6fc] hover:bg-stroke flex justify-center items-center">
-                    <Icon name="mdi-pencil" class="text-main text-2xl" />
+    <v-dialog v-model="isEditingCat" max-width="400" width="400">
+        <v-card>
+            <v-card-title>
+                <div class="flex flex-row justify-between items-center">
+                    <span class="font-semibold">
+                        Edit {{ catEditData.name }}
+                    </span>
+                    <div class="rounded-lg h-8 w-8 bg-[#f1f6fc] hover:bg-stroke flex justify-center items-center">
+                        <Icon name="mdi-pencil" class="text-main text-2xl" />
+                    </div>
                 </div>
+            </v-card-title>
+
+            <v-divider :thickness="2" class="border-opacity-50"></v-divider>
+
+            <div class="p-4">
+                <v-form @submit.prevent>
+                    <span class="text-main font-semibold">Name</span>
+                    <v-text-field v-model="catEditData.name" :rules="rulesCatname" placeholder="Enter the cat's name"
+                        variant="outlined" class="mt-2" :hint="catEditData.name.length + '/30'" maxlength="30"
+                        persistent-hint :disabled="isLoadingView || isActionLoading"></v-text-field>
+
+                    <span class="text-main font-semibold">Description</span>
+                    <v-textarea v-model="catEditData.description" placeholder="Write here..." row-height="25" rows="3"
+                        no-resize bg-color="white" variant="outlined" :hint="catEditData.description.length + '/100'"
+                        maxlength="100" persistent-hint :rules="rulesCatDescription" class="mt-2"
+                        :disabled="isLoadingView || isActionLoading"></v-textarea>
+                </v-form>
             </div>
-        </v-card-title>
-
-        <v-divider
-            :thickness="2"
-            class="border-opacity-50"
-        ></v-divider>
-        
-        <div class="p-4" >
-            <v-form @submit.prevent>
-                <span class="text-main font-semibold" >Name</span>
-                <v-text-field
-                    v-model="catEditData.name"
-                    :rules="rulesCatname"
-                    placeholder="Enter the cat's name"
-                    variant="outlined"
-                    class="mt-2"
-                    :hint="catEditData.name.length + '/30'"
-                    maxlength="30"
-                    persistent-hint
-                    :disabled="isLoadingView || isActionLoading"
-                ></v-text-field>
-
-                <span class="text-main font-semibold" >Description</span>
-                <v-textarea
-                    v-model="catEditData.description"
-                    placeholder="Write here..."
-                    row-height="25"
-                    rows="3"
-                    no-resize
-                    bg-color="white"
-                    variant="outlined"
-                    :hint="catEditData.description.length + '/100'"
-                    maxlength="100"
-                    persistent-hint
-                    :rules="rulesCatDescription"
-                    class="mt-2"
-                    :disabled="isLoadingView || isActionLoading"
-                ></v-textarea>
-            </v-form>
-        </div>
-        <template v-slot:actions>
-            <v-btn
-                text="Cancel"
-                @click="isEditingCat = false"
-                color="stroke"
-                variant="flat"
-                width="100"
-                :disabled="isLoadingView || isActionLoading"
-            ></v-btn>
-            <v-btn
-                text="Save"
-                @click="updateCat(catEditData.id, catEditData.name, catEditData.description)"
-                color="main"
-                variant="flat"
-                width="100"
-                :disabled="isLoadingView || isActionLoading"
-            ></v-btn>
-        </template>
-      </v-card>
+            <template v-slot:actions>
+                <v-btn text="Cancel" @click="isEditingCat = false" color="stroke" variant="flat" width="100"
+                    :disabled="isLoadingView || isActionLoading"></v-btn>
+                <v-btn text="Save" @click="updateCat(catEditData.id, catEditData.name, catEditData.description)"
+                    color="main" variant="flat" width="100" :disabled="isLoadingView || isActionLoading"></v-btn>
+            </template>
+        </v-card>
     </v-dialog>
-    <v-dialog
-      v-model="isDeletingCat"
-      max-width="400"
-    width="400"
-    >
-      <v-card>
+    <v-dialog v-model="isDeletingCat" max-width="400" width="400">
+        <v-card>
 
-            
-        
-        <v-card-title>
-            <div class="flex flex-row justify-between items-center" >
-                <span class="font-semibold">
-                    Are You Sure?
-                </span>
-                <div class="rounded-lg h-8 w-8 bg-[#fff5f5] hover:bg-stroke flex justify-center items-center">
-                    <Icon name="mdi-delete" class="text-danger text-2xl" />
+
+
+            <v-card-title>
+                <div class="flex flex-row justify-between items-center">
+                    <span class="font-semibold">
+                        Are You Sure?
+                    </span>
+                    <div class="rounded-lg h-8 w-8 bg-[#fff5f5] hover:bg-stroke flex justify-center items-center">
+                        <Icon name="mdi-delete" class="text-danger text-2xl" />
+                    </div>
                 </div>
-            </div>
-        </v-card-title>
+            </v-card-title>
 
-        <v-divider
-            :thickness="2"
-            class="border-opacity-50"
-        ></v-divider>
-        <v-card-text>
-            <span class="">Are you sure that you want to delete this cat's profile? This action cannot be undone.</span>
-        </v-card-text>
-        <template v-slot:actions>
-            <v-btn
-                text="Cancel"
-                @click="isDeletingCat = false"
-                color="stroke"
-                variant="flat"
-                width="100"
-                :disabled="isLoadingView || isActionLoading"
-            ></v-btn>
-            <v-btn
-                text="Delete"
-                @click="deleteCat(catIdToDelete)"
-                color="danger"
-                variant="flat"
-                width="100"
-                :disabled="isLoadingView || isActionLoading"
-            ></v-btn>
-        </template>
-      </v-card>
+            <v-divider :thickness="2" class="border-opacity-50"></v-divider>
+            <v-card-text>
+                <span class="">Are you sure that you want to delete this cat's profile? This action cannot be
+                    undone.</span>
+            </v-card-text>
+            <template v-slot:actions>
+                <v-btn text="Cancel" @click="isDeletingCat = false" color="stroke" variant="flat" width="100"
+                    :disabled="isLoadingView || isActionLoading"></v-btn>
+                <v-btn text="Delete" @click="deleteCat(catIdToDelete)" color="danger" variant="flat" width="100"
+                    :disabled="isLoadingView || isActionLoading"></v-btn>
+            </template>
+        </v-card>
     </v-dialog>
 </template>
 
