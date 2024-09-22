@@ -258,6 +258,42 @@ const filteredCats = computed(() => {
     );
 });
 
+const catIdToAdoptLock = ref(0);
+
+const catAdoptLock = async (id: number) => {
+
+isActionLoading.value = true;
+
+    try {
+        const response = await fetch(`/api/cats/${id}/adopted`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.log('Error locking cat adoption:', errorData.error);
+            useNuxtApp().$toast.error('Error locking cat adoption. Please try again.');
+        } else {
+            useNuxtApp().$toast.success('Cat adoption locked successfully!');
+            await fetchCats();
+            isDeletingCat.value = false;
+        }
+    } catch (error) {
+        console.error('Error locking cat adoption:', error);
+        throw error;
+    } finally {
+        isActionLoading.value = false;
+    }
+}
+
+const handleLockCatAdoption = (catId: number) => {
+    catIdToAdoptLock.value = catId;
+    catAdoptLock(catIdToAdoptLock.value);
+}
+
 </script>
 
 <template>
@@ -355,7 +391,7 @@ const filteredCats = computed(() => {
                             </tr>
                         </thead>
                         <tbody v-if="!isLoadingView && !isActionLoading" >
-                            <tr v-for="cat in filteredCats" :key="cat.id">
+                            <tr v-for="cat in filteredCats" :key="cat.id" :class="{'bg-green-50': !cat.adopted, 'bg-red-50': cat.adopted}">
                                 <td class="py-2 px-4 border-b border-grey-light">
                                     <div @click="handleEditCat(cat.id, cat.name, cat.description)" class="image-container">
                                         <img :src="cat.imageUrl" alt="Cat Picture" class="rounded-full h-12 w-12 cursor-pointer">
@@ -368,6 +404,15 @@ const filteredCats = computed(() => {
                                 <td class="py-2 px-4 border-b border-grey-light">{{ cat.description }}</td>
                                 <td class="py-2 px-4 border-b border-grey-light hidden md:table-cell">
                                     <div class="flex gap-2">
+                                        <div>
+                                            <div v-if="cat.adopted" @click="handleLockCatAdoption(cat.id)" class="rounded-lg h-8 w-8 bg-[#b2f2e055] hover:bg-stroke flex justify-center items-center cursor-pointer">
+                                                <Icon name="mdi-unlocked" class="text-success text-2xl" />
+                                            </div>
+                                            <div v-else @click="handleLockCatAdoption(cat.id)" class="rounded-lg h-8 w-8 bg-[#b2f2e055] hover:bg-stroke flex justify-center items-center cursor-pointer">
+                                                <Icon name="mdi:lock" class="text-danger text-2xl" />
+                                            </div>
+                                        </div>
+                                        
                                         <div @click="handleEditCat(cat.id, cat.name, cat.description)" class="rounded-lg h-8 w-8 bg-[#f1f6fc] hover:bg-stroke flex justify-center items-center cursor-pointer">
                                             <Icon name="mdi-pencil" class="text-main text-2xl" />
                                         </div>

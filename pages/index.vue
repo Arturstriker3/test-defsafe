@@ -256,7 +256,7 @@ const adoptionConfirmModal = ref(false);
                   text="Adopt"
                   @click="isMobileCheck(cat.id)"
                   block
-                  :disabled="isLoadingView || isAdoptingCat"
+                  :disabled="isLoadingView || isAdoptingCat || cat.adopted"
                 ></v-btn>
                 </div>
               </v-card-actions>
