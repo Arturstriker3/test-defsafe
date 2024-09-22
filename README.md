@@ -19,6 +19,7 @@ Start the development server on `http://localhost:3000`:
 npm run dev
 
 Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+```bash
 
 **Identidade Visual**
 <div align="center">
