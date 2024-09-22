@@ -35,7 +35,7 @@ const toggleMenu = () => {
 }
 
 const logout = async () => {
-    if(isLoadingView.value || isActionLoading.value) {
+    if(!isLoadingView.value || !isActionLoading.value) {
         try {
             const { error } = await client.auth.signOut()
             if(error) throw error
@@ -294,6 +294,33 @@ const handleLockCatAdoption = (catId: number) => {
     catAdoptLock(catIdToAdoptLock.value);
 }
 
+const getRandomNameLoading = ref(false);
+const getRandomCatNameService = async () => {
+    if (getRandomNameLoading.value) return;
+
+    getRandomNameLoading.value = true;
+    
+    try {
+        const response = await fetch(`https://tools.estevecastells.com/api/cats/v1?limit=1`, {
+            method: 'GET',
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+            const randomCatName = result.name;
+            newCatData.value.name = randomCatName;
+            useNuxtApp().$toast.success('Random cat name fetched successfully!');
+        } else {
+            console.error('Error fetching random cat name:', result.error);
+            useNuxtApp().$toast.error('Error fetching random cat name. Please try again.');
+        }
+    } catch (error) {
+        console.error('Error fetching random cat name:', error);
+    } finally {
+        getRandomNameLoading.value = false;
+    }
+};
+
 </script>
 
 <template>
@@ -447,8 +474,8 @@ const handleLockCatAdoption = (catId: number) => {
                 <span class="font-semibold">
                     Register New Cat
                 </span>
-                <div class="rounded-lg h-8 w-8 bg-[#b2f2e055] hover:bg-stroke flex justify-center items-center">
-                    <Icon name="mdi-plus" class="text-success text-2xl" />
+                <div @click="getRandomCatNameService()" class="rounded-lg h-8 w-8 bg-[#f1f6fc] hover:bg-stroke flex justify-center items-center cursor-pointer">
+                    <Icon name="fad:random-1dice" class="text-main text-2xl" />
                 </div>
             </div>
         </v-card-title>
