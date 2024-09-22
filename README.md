@@ -6,12 +6,12 @@
 
 **Identidade Visual**
 <div align="center">
-<img src="https://github.com/user-attachments/assets/ee44ae55-6a39-48ec-93ce-141f09333c8d" width="auto" height="auto" />
+<img src="https://github.com/user-attachments/assets/c5d52d9f-8d3a-4186-9a67-66e1b3d7beee" width="auto" height="auto" />
 </div>
 <br/>
 
 <div align="center">
-<img src="https://github.com/user-attachments/assets/71bb7443-31de-4325-9507-a8ba6b86c6f2" width="auto" height="auto" />
+<img src="https://github.com/user-attachments/assets/922c1bbe-2fc6-4865-bee1-b2bd817d01f3" width="auto" height="auto" />
 </div>
 <br/>
 
