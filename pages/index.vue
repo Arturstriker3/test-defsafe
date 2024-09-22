@@ -76,6 +76,7 @@ const fetchCats = async () => {
       cats.value = result.body;
     } else {
       console.error('Erro ao buscar gatos:', result.error);
+      useNuxtApp().$toast.error('Error loading cats')
     }
   } catch (error) {
     console.error('Erro ao buscar gatos:', error);
@@ -169,9 +170,11 @@ const sendAdoptionForm = async (catId: number) => {
     const result = await response.json();
     if (response.ok) {
       isAdoptingCat.value = false;
+      useNuxtApp().$toast.success('Adoption form sent successfully');
       await fetchCats();
     } else {
       console.error('Erro ao enviar formulário de adoção:', result.error);
+      useNuxtApp().$toast.error('Error sending adoption form')
     }
   } catch (error) {
     console.error('Erro ao enviar formulário de adoção:', error);
