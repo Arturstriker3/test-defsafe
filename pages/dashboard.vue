@@ -1,14 +1,13 @@
 
 <script setup  lang="ts">
 
-import { useNuxt } from 'nuxt/kit';
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router';
 const client = useSupabaseClient()
 const router = useRouter()
 
 const menuBtn = ref(false)
-const isLoading = ref(false)
+const isLoadingView = ref(false)
 const isCreatingNewCat = ref(false);
 const isEditingCat = ref(false);
 const isDeletingCat = ref(false);

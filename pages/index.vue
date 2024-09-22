@@ -7,6 +7,7 @@ import EmailUtils from '@/utils/email.utils';
 const router = useRouter()
 
 const isMobile = ref(false);
+const isLoadingView = ref(false);
 
 watch(() => window.innerWidth, (width) => {
   if(width < 768) {
@@ -29,6 +30,7 @@ const navigateAuth = () => {
 }
 
 const isAdoptingCat = ref(false);
+const isAdoptingCatModal = ref(false);
 const cats = ref<Cat[]>([]);
 
 const newGuardianData = ref<Guardian>({
@@ -56,6 +58,7 @@ export interface Guardian {
 }
 
 const fetchCats = async () => {
+  isLoadingView.value = true;
   try {
     const response = await fetch('/api/cats', {
       method: 'GET',
@@ -69,14 +72,17 @@ const fetchCats = async () => {
       cats.value = result.body;
     } else {
       console.error('Erro ao buscar gatos:', result.error);
-      useNuxtApp().$toast.error('Error loading cats')
+      useNuxtApp().$toast.error('Error loading cats');
     }
   } catch (error) {
     console.error('Erro ao buscar gatos:', error);
+  } finally {
+    isLoadingView.value = false;
   }
 };
 
 onMounted(() => {
+  isLoadingView.value = true;
   fetchCats();
 });
 
@@ -87,7 +93,7 @@ const handleNewGuardian = () => {
     telephone: '',
     description: ''
   }
-  isAdoptingCat.value = true;
+  isAdoptingCatModal.value = true;
 }
 
 const rulesGuardianName = [
@@ -143,6 +149,8 @@ const handleAdoptCatGetById = (catId: number) => {
 
 const sendAdoptionForm = async (catId: number) => {
 
+  isAdoptingCat.value = true;
+
   const cleanedTelephone = newGuardianData.value.telephone.replace(/\D/g, '');
 
   const formattedGuardianData = {
@@ -162,7 +170,7 @@ const sendAdoptionForm = async (catId: number) => {
 
     const result = await response.json();
     if (response.ok) {
-      isAdoptingCat.value = false;
+      isAdoptingCatModal.value = false;
       useNuxtApp().$toast.success('Adoption form sent successfully');
       adoptionConfirmModal.value = true;
       await fetchCats();
@@ -172,6 +180,8 @@ const sendAdoptionForm = async (catId: number) => {
     }
   } catch (error) {
     console.error('Erro ao enviar formulário de adoção:', error);
+  } finally {
+    isAdoptingCat.value = false;
   }
 };
 
@@ -191,7 +201,7 @@ const adoptionConfirmModal = ref(false);
             </div>
             <div class="space-x-5">
                 <div class=" flex items-center">
-                    <v-btn class="mt-2 bg-main" type="submit" color="main" @click="navigateAuth()">
+                    <v-btn :disabled="isLoadingView || isAdoptingCat" class="mt-2 bg-main" type="submit" color="main" @click="navigateAuth()">
                         <p class="hidden md:block">Admin</p>
                         <div class="block md:hidden">
                             <Icon name="material-symbols:admin-panel-settings-rounded" class="text-white text-2xl" />
@@ -212,7 +222,7 @@ const adoptionConfirmModal = ref(false);
             <p class="hidden md:inline" >Explore our list of lovable cats looking for their forever homes.</p>
           </div>
 
-          <div class="mx-0 w-screen justify-items-center justify-between gap-y-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mb-10" >
+          <div v-if="!isLoadingView" class="mx-0 w-screen justify-items-center justify-between gap-y-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mb-10" >
             <div v-for="cat in cats" :key="cat.id">
               <v-card
               max-width="300"
@@ -246,15 +256,26 @@ const adoptionConfirmModal = ref(false);
                   text="Adopt"
                   @click="isMobileCheck(cat.id)"
                   block
+                  :disabled="isLoadingView || isAdoptingCat"
                 ></v-btn>
                 </div>
               </v-card-actions>
               </v-card>
             </div>
           </div>
+
+          <div class="flex justify-center items-center h-full" v-else>
+            <v-progress-circular
+              :size="200"
+              color="main"
+              indeterminate
+              class="mt-6"
+            ></v-progress-circular>
+          </div>
+
         </div>
         <v-dialog
-          v-model="isAdoptingCat"
+          v-model="isAdoptingCatModal"
           max-width="400"
           width="400"
           :fullscreen="isMobile"
@@ -289,6 +310,7 @@ const adoptionConfirmModal = ref(false);
                         :hint="newGuardianData.fullName.length + '/30'"
                         maxlength="30"
                         persistent-hint
+                        :disabled="isLoadingView || isAdoptingCat"
                     ></v-text-field>
 
                     <span class="text-main font-semibold" >Email</span>
@@ -301,6 +323,7 @@ const adoptionConfirmModal = ref(false);
                         :hint="'Must be like @domain.com'"
                         maxlength="50"
                         persistent-hint
+                        :disabled="isLoadingView || isAdoptingCat"
                     ></v-text-field>
 
                     <span class="text-main font-semibold" >Telephone</span>
@@ -313,6 +336,7 @@ const adoptionConfirmModal = ref(false);
                         class="mt-2 mb-1"
                         :hint="'Type only numbers'"
                         persistent-hint
+                        :disabled="isLoadingView || isAdoptingCat"
                     ></v-text-field>
 
                     <span class="text-main font-semibold" >Why do you want to adopt this cat?</span>
@@ -329,6 +353,7 @@ const adoptionConfirmModal = ref(false);
                         persistent-hint
                         :rules="rulesGuardianDescription"
                         class="mt-2 mb-1"
+                        :disabled="isLoadingView || isAdoptingCat"
                     ></v-textarea>
                 </v-form>
             </div>
@@ -338,10 +363,11 @@ const adoptionConfirmModal = ref(false);
               <div class="flex gap-4 px-2 mb-2" >
                 <v-btn
                     text="Cancel"
-                    @click="isAdoptingCat = false"
+                    @click="isAdoptingCatModal = false"
                     color="stroke"
                     variant="flat"
                     width="100"
+                    :disabled="isLoadingView || isAdoptingCat"
                 ></v-btn>
                 <v-btn
                     text="Submit"
@@ -349,6 +375,7 @@ const adoptionConfirmModal = ref(false);
                     color="main"
                     width="100"
                     variant="flat"
+                    :disabled="isLoadingView || isAdoptingCat"
                 ></v-btn>
               </div>
             </template>
@@ -385,6 +412,7 @@ const adoptionConfirmModal = ref(false);
                 color="main"
                 block
                 variant="flat"
+                :disabled="isLoadingView || isAdoptingCat"
             ></v-btn>
         </template>
       </v-card>
