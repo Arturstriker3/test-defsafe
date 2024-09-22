@@ -10,6 +10,7 @@ const menuBtn = ref(false)
 const isLoading = ref(false)
 const isCreatingNewCat = ref(false);
 const isEditingCat = ref(false);
+const isDeletingCat = ref(false);
 const cats = ref<Cat[]>([]);
 const catEditData = ref({
     id: 0,
@@ -115,10 +116,9 @@ const addNewCat = async () => {
 
         const result = await response.json();
         if (response.ok) {
-            console.log('Cat uploaded successfully:', result);
-            // Optionally reset form or redirect
+            fetchCats()
             newCatData.value = { name: '', description: '', imageBase64: '' };
-            isCreatingNewCat.value = false; // Close the dialog
+            isCreatingNewCat.value = false;
         } else {
             console.error('Error uploading cat:', result);
         }
@@ -187,6 +187,36 @@ const updateCat = async (id: number, catNewName: string, catNewDescription: stri
     }
 }
 
+const catIdToDelete = ref(0);
+
+const handleDeleteCat = (catId: number) => {
+    catIdToDelete.value = catId;
+    isDeletingCat.value = !isDeletingCat.value;
+}
+
+const deleteCat = async (id: number) => {
+    try {
+        const response = await fetch(`/api/cats/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`Error deleting cat: ${errorData.error}`);
+        } else {
+            fetchCats()
+            isDeletingCat.value = false;
+        }
+    } catch (error) {
+        console.error('Error deleting cat:', error);
+        throw error;
+    }
+}
+
+
 </script>
 
 <template>
@@ -228,8 +258,8 @@ const updateCat = async (id: number, catNewName: string, catNewDescription: stri
                         <span>Cat List</span>
                     </a>
                     <a @click.prevent="navigateHome" class="menu-item block hover:text-white font-medium py-2.5 px-4 my-4 rounded transition duration-200 hover:bg-gradient-to-r hover:from-main hover:to-main" href="#">
-                        <Icon name="mdi:test-tube" class="icon text-4xl mr-2" />
-                        <span>Test</span>
+                        <Icon name="mdi:pets" class="icon text-4xl mr-2" />
+                        <span>Adoption</span>
                     </a>
                 </nav>
                 <!-- Ítem de Cerrar Sesión -->
@@ -275,7 +305,7 @@ const updateCat = async (id: number, catNewName: string, catNewDescription: stri
                     <div class="my-10" >
                         <div class="md:hidden flex flex-row gap-2 items-center" >
                             <Icon name="material-symbols:help" class="text-stroke text-2xl" />
-                            <span class="text-xs text-placeholder font-light">To edit a cat click the image</span>
+                            <span class="text-xs text-placeholder font-light">To edit a cat, click its image.</span>
                         </div>
                     </div>
                     <v-table class="w-full table-auto text-sm bg-white rounded-2xl">
@@ -291,7 +321,7 @@ const updateCat = async (id: number, catNewName: string, catNewDescription: stri
                             <tr v-for="cat in cats" :key="cat.id">
                                 <td class="py-2 px-4 border-b border-grey-light">
                                     <div @click="handleEditCat(cat.id, cat.name, cat.description)" class="image-container">
-                                        <img :src="cat.imageUrl" alt="Cat Picture" class="rounded-full h-12 w-12">
+                                        <img :src="cat.imageUrl" alt="Cat Picture" class="rounded-full h-12 w-12 cursor-pointer">
                                         <div class="icon flex justify-center items-center h-12 w-12 rounded-full bg-[#f1f6fc] hover:bg-stroke cursor-pointer">
                                             <Icon name="mdi-pencil" class="text-main text-2xl" />
                                         </div>
@@ -304,13 +334,13 @@ const updateCat = async (id: number, catNewName: string, catNewDescription: stri
                                         <div @click="handleEditCat(cat.id, cat.name, cat.description)" class="rounded-lg h-8 w-8 bg-[#f1f6fc] hover:bg-stroke flex justify-center items-center cursor-pointer">
                                             <Icon name="mdi-pencil" class="text-main text-2xl" />
                                         </div>
-                                        <div class="rounded-lg h-8 w-8 bg-[#fff5f5] hover:bg-stroke flex justify-center items-center cursor-pointer">
+                                        <div @click="handleDeleteCat(cat.id)"class="rounded-lg h-8 w-8 bg-[#fff5f5] hover:bg-stroke flex justify-center items-center cursor-pointer">
                                             <Icon name="mdi-delete" class="text-danger text-2xl" />
                                         </div>
                                     </div>
                                 </td>
                                 <td class="border-y border-grey-light table-cell md:hidden">
-                                    <div class="rounded-lg h-8 w-8 bg-[#fff5f5] hover:bg-stroke flex justify-center items-center cursor-pointer">
+                                    <div @click="handleDeleteCat(cat.id)" class="rounded-lg h-8 w-8 bg-[#fff5f5] hover:bg-stroke flex justify-center items-center cursor-pointer">
                                         <Icon name="mdi-delete" class="text-danger text-2xl" />
                                     </div>
                                 </td>
@@ -328,9 +358,14 @@ const updateCat = async (id: number, catNewName: string, catNewDescription: stri
     >
       <v-card>
         <v-card-title>
-            <span class="font-semibold">
-                Register New Cat
-            </span>
+            <div class="flex flex-row justify-between items-center" >
+                <span class="font-semibold">
+                    Register New Cat
+                </span>
+                <div class="rounded-lg h-8 w-8 bg-[#b2f2e055] hover:bg-stroke flex justify-center items-center">
+                    <Icon name="mdi-plus" class="text-success text-2xl" />
+                </div>
+            </div>
         </v-card-title>
 
         <v-divider
@@ -411,9 +446,14 @@ const updateCat = async (id: number, catNewName: string, catNewDescription: stri
     >
       <v-card>
         <v-card-title>
-            <span class="font-semibold">
-                Edit {{ catEditData.name }}
-            </span>
+            <div class="flex flex-row justify-between items-center" >
+                <span class="font-semibold">
+                    Edit {{ catEditData.name }}
+                </span>
+                <div class="rounded-lg h-8 w-8 bg-[#f1f6fc] hover:bg-stroke flex justify-center items-center">
+                    <Icon name="mdi-pencil" class="text-main text-2xl" />
+                </div>
+            </div>
         </v-card-title>
 
         <v-divider
@@ -464,6 +504,51 @@ const updateCat = async (id: number, catNewName: string, catNewDescription: stri
                 text="Save"
                 @click="updateCat(catEditData.id, catEditData.name, catEditData.description)"
                 color="main"
+                variant="flat"
+                width="100"
+            ></v-btn>
+        </template>
+      </v-card>
+    </v-dialog>
+    <v-dialog
+      v-model="isDeletingCat"
+      max-width="400"
+    width="400"
+    >
+      <v-card>
+
+            
+        
+        <v-card-title>
+            <div class="flex flex-row justify-between items-center" >
+                <span class="font-semibold">
+                    Are You Sure?
+                </span>
+                <div class="rounded-lg h-8 w-8 bg-[#fff5f5] hover:bg-stroke flex justify-center items-center">
+                    <Icon name="mdi-delete" class="text-danger text-2xl" />
+                </div>
+            </div>
+        </v-card-title>
+
+        <v-divider
+            :thickness="2"
+            class="border-opacity-50"
+        ></v-divider>
+        <v-card-text>
+            <span class="">Are you sure that you want to delete this cat's profile? This action cannot be undone.</span>
+        </v-card-text>
+        <template v-slot:actions>
+            <v-btn
+                text="Cancel"
+                @click="isDeletingCat = false"
+                color="stroke"
+                variant="flat"
+                width="100"
+            ></v-btn>
+            <v-btn
+                text="Delete"
+                @click="deleteCat(catIdToDelete)"
+                color="danger"
                 variant="flat"
                 width="100"
             ></v-btn>
