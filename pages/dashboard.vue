@@ -29,6 +29,7 @@ const navigateHome = () => {
 
 const handleNewCat = () => {
     isCreatingNewCat.value = !isCreatingNewCat.value
+    newCatData.value = { name: '', description: '', imageBase64: '' }
 }
 
 const rulesCatname = [
@@ -53,6 +54,59 @@ const newCatData = ref({
     description: '',
     imageBase64: ''
 })
+
+const convertToBase64 = (file: File) => {
+    return new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = (error) => reject(error);
+    });
+};
+
+const handleFileChange = async (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    if (target.files && target.files.length > 0) {
+        const file = target.files[0];
+        try {
+            newCatData.value.imageBase64 = await convertToBase64(file);
+        } catch (error) {
+            console.error('Error converting file to base64:', error);
+        }
+    }
+};
+
+const addNewCat = async () => {
+    try {
+        // Prepare the image file as base64
+        const imageFileInput = newCatData.value.imageBase64; // Assuming this is set correctly when the image is uploaded
+        const { name, description } = newCatData.value;
+
+        const response = await fetch('/api/cats', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                name,
+                description,
+                imageFile: imageFileInput, // base64 image data
+            }),
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+            console.log('Cat uploaded successfully:', result);
+            // Optionally reset form or redirect
+            newCatData.value = { name: '', description: '', imageBase64: '' };
+            isCreatingNewCat.value = false; // Close the dialog
+        } else {
+            console.error('Error uploading cat:', result);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+};
 
 </script>
 
@@ -205,7 +259,7 @@ const newCatData = ref({
             :thickness="2"
             class="border-opacity-50"
         ></v-divider>
-
+        
         <div class="p-4" >
             <v-form @submit.prevent>
                 
@@ -219,8 +273,9 @@ const newCatData = ref({
                     accept="image/png, image/jpeg"
                     :rules="rulesCatImage"
                     :clearable="false"
-                    
-                ></v-file-input>       
+                    class="mt-2"
+                    @change="handleFileChange"
+                ></v-file-input>
 
                 <span class="text-main font-semibold" >Name</span>
                 <v-text-field
@@ -247,8 +302,8 @@ const newCatData = ref({
                     maxlength="100"
                     persistent-hint
                     :rules="rulesCatDescription"
+                    class="mt-2"
                 ></v-textarea>
-
             </v-form>
         </div>
         
@@ -263,7 +318,7 @@ const newCatData = ref({
             ></v-btn>
             <v-btn
                 text="Save"
-                @click="isCreatingNewCat = false"
+                @click="addNewCat()"
                 color="main"
                 variant="flat"
                 width="100"

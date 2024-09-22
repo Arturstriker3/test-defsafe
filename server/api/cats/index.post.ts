@@ -1,14 +1,20 @@
 import { PrismaClient } from '@prisma/client'
 import { createClient } from '@supabase/supabase-js'
+import sharp from 'sharp';
 
 // Configurar Supabase
 const supabaseUrl = process.env.SUPABASE_URL || ''
 const supabaseKey = process.env.SUPABASE_KEY || ''
 const supabase = createClient(supabaseUrl, supabaseKey)
 
-const prisma = new PrismaClient()
+if (!supabaseUrl || !supabaseKey) {
+  throw new Error('Variáveis SUPABASE_URL e SUPABASE_KEY são obrigatórias.')
+}
 
 export default defineEventHandler(async (event) => {
+
+  const prisma = new PrismaClient()
+
   try {
     const body = await readBody(event) // Leitura dos dados da requisição
     const { name, description, imageFile } = body // Extrair os dados recebidos
@@ -22,17 +28,27 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    // Criar um nome único para a imagem (ex: usando timestamp)
-    const imageName = `cat-${Date.now()}.png`
+    // Criar um nome único para a imagem
+    const imageName = `cat-${body.name}.jpg`
 
-    // Upload da imagem no Supabase Bucket
-    const { data, error } = await supabase
-      .storage
-      .from('cats') // nome do bucket
-      .upload(imageName, Buffer.from(imageFile, 'base64')) // Convertendo a imagem de base64 para Buffer
+    const imageData = imageFile.split(',')[1]; // Remove o prefixo se necessário
+    const buffer = Buffer.from(imageData, 'base64');
 
-    if (error) {
-      throw new Error(`Erro ao fazer upload da imagem: ${error.message}`)
+    try {
+      const transformedBuffer = await sharp(buffer)
+        .toFormat('jpg')
+        .toBuffer();
+
+      const { data, error } = await supabase
+        .storage
+        .from('cats')
+        .upload(imageName, transformedBuffer);
+
+      if (error) {
+        throw new Error(`Erro ao fazer upload da imagem: ${error.message}`);
+      }
+    } catch (error) {
+      console.error(error);
     }
 
     // Obter a URL pública da imagem

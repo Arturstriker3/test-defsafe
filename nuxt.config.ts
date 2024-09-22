@@ -6,10 +6,11 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
-    public: {
-      SUPABASE_URL: process.env.SUPABASE_URL,
-      SUPABASE_KEY: process.env.SUPABASE_KEY
-    }
+    app: {
+      databaseUrl: process.env.DATABASE_URL,
+      directUrl: process.env.DIRECT_URL,
+      supabaseKey: process.env.SUPABASE_KEY,
+    },
   },
 
   compatibilityDate: '2024-04-03',
