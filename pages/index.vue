@@ -204,7 +204,7 @@ const adoptionConfirmModal = ref(false);
                     <v-btn :disabled="isLoadingView || isAdoptingCat" class="mt-2 bg-main" type="submit" color="main" @click="navigateAuth()">
                         <p class="hidden md:block">Admin</p>
                         <div class="block md:hidden">
-                            <Icon name="material-symbols:admin-panel-settings-rounded" class="text-white text-2xl" />
+                            <Icon name="mdi:user" class="text-white text-2xl" />
                         </div>
                     </v-btn>
                 </div>

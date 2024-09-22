@@ -1,13 +1,14 @@
 
 <script setup  lang="ts">
 
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router';
 const client = useSupabaseClient()
 const router = useRouter()
 
 const menuBtn = ref(false)
 const isLoadingView = ref(false)
+const isActionLoading = ref(false)
 const isCreatingNewCat = ref(false);
 const isEditingCat = ref(false);
 const isDeletingCat = ref(false);
@@ -34,17 +35,23 @@ const toggleMenu = () => {
 }
 
 const logout = async () => {
-    try {
-        const { error } = await client.auth.signOut()
-        if(error) throw error
-        router.push('/login')
-    } catch (error) {
-        console.log(error)
+    if(isLoadingView.value || isActionLoading.value) {
+        try {
+            const { error } = await client.auth.signOut()
+            if(error) throw error
+            router.push('/login')
+        } catch (error) {
+            console.log(error)
+        }
     }
 }
 
 const navigateHome = () => {
-    router.push('/')
+    if(isLoadingView.value || isActionLoading.value) {
+        return
+    } else {
+        router.push('/')
+    }
 }
 
 const handleNewCat = () => {
@@ -94,9 +101,11 @@ const handleFileChange = async (event: Event) => {
 };
 
 const addNewCat = async () => {
+
+    isActionLoading.value = true;
+
     try {
-        // Prepare the image file as base64
-        const imageFileInput = newCatData.value.imageBase64; // Assuming this is set correctly when the image is uploaded
+        const imageFileInput = newCatData.value.imageBase64;
         const { name, description } = newCatData.value;
 
         const response = await fetch('/api/cats', {
@@ -107,7 +116,7 @@ const addNewCat = async () => {
             body: JSON.stringify({
                 name,
                 description,
-                imageFile: imageFileInput, // base64 image data
+                imageFile: imageFileInput,
             }),
         });
 
@@ -123,11 +132,15 @@ const addNewCat = async () => {
         }
     } catch (error) {
         console.error('Error:', error);
+    } finally {
+        isActionLoading.value = false;
     }
 };
 
-// Função para buscar gatos da API
 const fetchCats = async () => {
+
+    isLoadingView.value = true;
+
   try {
     const response = await fetch('/api/cats', {
       method: 'GET',
@@ -145,10 +158,13 @@ const fetchCats = async () => {
     }
   } catch (error) {
     console.error('Erro ao buscar gatos:', error);
+  } finally {
+    isLoadingView.value = false;
   }
 };
 
 onMounted(() => {
+    isLoadingView.value = true;
   fetchCats();
 });
 
@@ -162,6 +178,9 @@ const handleEditCat = (catId: number, catName: string, catDescription: string) =
 }
 
 const updateCat = async (id: number, catNewName: string, catNewDescription: string) => {
+
+    isActionLoading.value = true;
+
     try {
         const response = await fetch(`/api/cats/${id}`, {
             method: 'PUT',
@@ -186,6 +205,8 @@ const updateCat = async (id: number, catNewName: string, catNewDescription: stri
     } catch (error) {
         console.error('Error updating cat:', error);
         throw error;
+    } finally {
+        isActionLoading.value = false;
     }
 }
 
@@ -197,6 +218,9 @@ const handleDeleteCat = (catId: number) => {
 }
 
 const deleteCat = async (id: number) => {
+
+    isActionLoading.value = true;
+
     try {
         const response = await fetch(`/api/cats/${id}`, {
             method: 'DELETE',
@@ -217,9 +241,22 @@ const deleteCat = async (id: number) => {
     } catch (error) {
         console.error('Error deleting cat:', error);
         throw error;
+    } finally {
+        isActionLoading.value = false;
     }
 }
 
+const searchQuery = ref('');
+
+const filteredCats = computed(() => {
+    if (!searchQuery.value) {
+        return cats.value;
+    }
+    return cats.value.filter(cat =>
+        cat.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+        cat.description.toLowerCase().includes(searchQuery.value.toLowerCase())
+    );
+});
 
 </script>
 
@@ -285,17 +322,17 @@ const deleteCat = async (id: number) => {
             <div class="flex-1 p-4 w-full md:w-1/2 bg-[#fafbfc]">
 
                 <div class="relative max-w-md w-full">
-                    <input class="w-full h-10 pl-10 pr-4 py-1 text-base placeholder-placeholder border rounded-full focus:shadow-outline" type="search" placeholder="Search...">
+                    <input v-model="searchQuery" :disabled="isLoadingView || isActionLoading" class="w-full h-10 pl-10 pr-4 py-1 text-base placeholder-placeholder border rounded-full focus:shadow-outline" type="search" placeholder="Search...">
                 </div>
                 <div class="mt-8">
                     <div class="flex flex-row items-center justify-between" >
-                        <div class="flex flex-row items-center gap-4">
+                        <div :disabled="isLoadingView || isActionLoading" class="flex flex-row items-center gap-4">
                             <div class="rounded-lg h-16 w-16 bg-[#f1f6fc] flex justify-center items-center">
                                 <Icon name="solar:cat-bold" class="text-main text-4xl" />
                             </div>
                             <h2 class="text-black text-xl font-semibold">Cat List</h2>
                         </div>
-                        <v-btn @click="handleNewCat()" class="mt-2 bg-main" type="submit" color="main">
+                        <v-btn :disabled="isLoadingView || isActionLoading" @click="handleNewCat()" class="mt-2 bg-main" type="submit" color="main">
                             <p class="hidden md:block">New Cat</p>
                             <div class="block md:hidden">
                                 <Icon name="mdi-add" class="text-white text-2xl" />
@@ -317,8 +354,8 @@ const deleteCat = async (id: number) => {
                                 <th class="py-2 px-4 text-base border-b border-grey-light hidden md:table-cell">Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr v-for="cat in cats" :key="cat.id">
+                        <tbody v-if="!isLoadingView && !isActionLoading" >
+                            <tr v-for="cat in filteredCats" :key="cat.id">
                                 <td class="py-2 px-4 border-b border-grey-light">
                                     <div @click="handleEditCat(cat.id, cat.name, cat.description)" class="image-container">
                                         <img :src="cat.imageUrl" alt="Cat Picture" class="rounded-full h-12 w-12 cursor-pointer">
@@ -347,6 +384,9 @@ const deleteCat = async (id: number) => {
                             </tr>
                         </tbody>
                     </v-table>
+                    <div v-if="isLoadingView || isActionLoading" class="w-full">
+                        <v-progress-linear model-value="20" indeterminate color="main"></v-progress-linear>
+                    </div>
                 </div>
             </div>
         </div>
@@ -388,6 +428,7 @@ const deleteCat = async (id: number) => {
                     :clearable="false"
                     class="mt-2"
                     @change="handleFileChange"
+                    :disabled="isLoadingView || isActionLoading"
                 ></v-file-input>
 
                 <span class="text-main font-semibold" >Name</span>
@@ -400,6 +441,7 @@ const deleteCat = async (id: number) => {
                     :hint="newCatData.name.length + '/30'"
                     maxlength="30"
                     persistent-hint
+                    :disabled="isLoadingView || isActionLoading"
                 ></v-text-field>
 
                 <span class="text-main font-semibold" >Description</span>
@@ -416,6 +458,7 @@ const deleteCat = async (id: number) => {
                     persistent-hint
                     :rules="rulesCatDescription"
                     class="mt-2"
+                    :disabled="isLoadingView || isActionLoading"
                 ></v-textarea>
             </v-form>
         </div>
@@ -428,6 +471,7 @@ const deleteCat = async (id: number) => {
                 color="stroke"
                 variant="flat"
                 width="100"
+                :disabled="isLoadingView || isActionLoading"
             ></v-btn>
             <v-btn
                 text="Save"
@@ -435,6 +479,7 @@ const deleteCat = async (id: number) => {
                 color="main"
                 variant="flat"
                 width="100"
+                :disabled="isLoadingView || isActionLoading"
             ></v-btn>
         </template>
       </v-card>
@@ -473,6 +518,7 @@ const deleteCat = async (id: number) => {
                     :hint="catEditData.name.length + '/30'"
                     maxlength="30"
                     persistent-hint
+                    :disabled="isLoadingView || isActionLoading"
                 ></v-text-field>
 
                 <span class="text-main font-semibold" >Description</span>
@@ -489,6 +535,7 @@ const deleteCat = async (id: number) => {
                     persistent-hint
                     :rules="rulesCatDescription"
                     class="mt-2"
+                    :disabled="isLoadingView || isActionLoading"
                 ></v-textarea>
             </v-form>
         </div>
@@ -499,6 +546,7 @@ const deleteCat = async (id: number) => {
                 color="stroke"
                 variant="flat"
                 width="100"
+                :disabled="isLoadingView || isActionLoading"
             ></v-btn>
             <v-btn
                 text="Save"
@@ -506,6 +554,7 @@ const deleteCat = async (id: number) => {
                 color="main"
                 variant="flat"
                 width="100"
+                :disabled="isLoadingView || isActionLoading"
             ></v-btn>
         </template>
       </v-card>
@@ -544,6 +593,7 @@ const deleteCat = async (id: number) => {
                 color="stroke"
                 variant="flat"
                 width="100"
+                :disabled="isLoadingView || isActionLoading"
             ></v-btn>
             <v-btn
                 text="Delete"
@@ -551,6 +601,7 @@ const deleteCat = async (id: number) => {
                 color="danger"
                 variant="flat"
                 width="100"
+                :disabled="isLoadingView || isActionLoading"
             ></v-btn>
         </template>
       </v-card>
