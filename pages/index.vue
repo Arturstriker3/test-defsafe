@@ -182,17 +182,15 @@ const adoptionConfirmModal = ref(false);
 
 <template>
   <div class="flex flex-col h-screen">
-    <!-- Barra de navegación superior -->
         <div class="bg-white text-white  w-full p-2 flex items-center justify-between">
             <div class="flex items-center">
-                <div class="flex items-center gap-2 px-4"> <!-- Mostrado en todos los dispositivos -->
+                <div class="flex items-center gap-2 px-4">
                     <Icon name="ph:cat-fill" class="text-main text-5xl" />
                     <h2 class="text-main font-semibold">Cat Adoption Platform</h2>
                 </div>
             </div>
-            <!-- Ícono de Notificación y Perfil -->
             <div class="space-x-5">
-                <div class=" flex items-center"> <!-- Se muestra solo en dispositivos pequeños -->
+                <div class=" flex items-center">
                     <v-btn class="mt-2 bg-main" type="submit" color="main" @click="navigateAuth()">
                         <p class="hidden md:block">Admin</p>
                         <div class="block md:hidden">
@@ -208,7 +206,6 @@ const adoptionConfirmModal = ref(false);
             class="border-opacity-50 mt-2"
         ></v-divider>
 
-        <!-- Contenido principal -->
         <div>
           <div class="mt-9 mb-6 pl-6">
             <h2 class="text-main text-3xl font-semibold" >Cats for adoption</h2>

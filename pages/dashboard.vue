@@ -1,6 +1,7 @@
 
 <script setup  lang="ts">
 
+import { useNuxt } from 'nuxt/kit';
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router';
 const client = useSupabaseClient()
@@ -54,19 +55,16 @@ const handleNewCat = () => {
 
 const rulesCatname = [
     (value: string) => !!value || 'You must enter the cat name.',
-    //
 ]
 
 const rulesCatDescription = [
     (value: string) => !!value || 'You must enter the cat description.',
-    //
 ]
 
 const rulesCatImage = [
     (value: FileList) => !!value.length || 'You must upload the cat image.',
     (value: FileList) => !value.length || value[0].size < 5000000 || 'Cat image should be less than 5 MB.',
     (value: FileList) => !value.length || ['image/jpeg', 'image/png'].includes(value[0].type) || 'Cat image must be a .jpeg or .png file.',
-    //
 ]
 
 const newCatData = ref({
@@ -116,11 +114,13 @@ const addNewCat = async () => {
 
         const result = await response.json();
         if (response.ok) {
+            useNuxtApp().$toast.success('Cat added successfully!');
             await fetchCats();
             newCatData.value = { name: '', description: '', imageBase64: '' };
             isCreatingNewCat.value = false;
         } else {
             console.error('Error uploading cat:', result);
+            useNuxtApp().$toast.error('Error uploading cat. Please try again.');
         }
     } catch (error) {
         console.error('Error:', error);
@@ -142,6 +142,7 @@ const fetchCats = async () => {
       cats.value = result.body;
     } else {
       console.error('Erro ao buscar gatos:', result.error);
+      useNuxtApp().$toast.error('Error loading cats')
     }
   } catch (error) {
     console.error('Erro ao buscar gatos:', error);
@@ -176,8 +177,10 @@ const updateCat = async (id: number, catNewName: string, catNewDescription: stri
 
         if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(`Error updating cat: ${errorData.error}`);
+            console.log('Error updating cat:', errorData.error);
+            useNuxtApp().$toast.error('Error updating cat. Please try again.');
         } else {
+            useNuxtApp().$toast.success('Cat updated successfully!');
             await fetchCats();
             isEditingCat.value = false;
         }
@@ -205,8 +208,10 @@ const deleteCat = async (id: number) => {
 
         if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(`Error deleting cat: ${errorData.error}`);
+            console.log('Error deleting cat:', errorData.error);
+            useNuxtApp().$toast.error('Error deleting cat. Please try again.');
         } else {
+            useNuxtApp().$toast.success('Cat deleted successfully!');
             await fetchCats();
             isDeletingCat.value = false;
         }
@@ -221,17 +226,15 @@ const deleteCat = async (id: number) => {
 
 <template>
     <div class="flex flex-col h-screen bg-stroke">
-    <!-- Barra de navegación superior -->
         <div class="bg-white text-white shadow w-full p-2 flex items-center justify-between">
             <div class="flex items-center">
-                <div class="flex items-center gap-2 px-4"> <!-- Mostrado en todos los dispositivos -->
+                <div class="flex items-center gap-2 px-4">
                     <Icon name="ph:cat-fill" class="text-main text-5xl" />
                     <h2 class="text-main font-semibold">Cat Adoption Platform</h2>
                 </div>
             </div>
-            <!-- Ícono de Notificación y Perfil -->
             <div class="space-x-5">
-                <div class="md:hidden flex items-center"> <!-- Se muestra solo en dispositivos pequeños -->
+                <div class="md:hidden flex items-center">
                     <button class="hover:cursor-pointer" id="menuBtn" @click="toggleMenu">
                         <Icon name="material-symbols:menu" class="icon text-black text-4xl mr-2" />
                     </button>
@@ -239,9 +242,7 @@ const deleteCat = async (id: number) => {
             </div>
         </div>
 
-        <!-- Contenido principal -->
         <div class="flex-1 flex flex-wrap">
-            <!-- Barra lateral de navegação -->
             <div
                 class="p-2 bg-white w-full md:w-60 md:flex flex-col fixed md:relative"
                 :class="{ 'hidden': !menuBtn, 'flex': menuBtn, 'md:flex': true }"
@@ -262,7 +263,7 @@ const deleteCat = async (id: number) => {
                         <span>Adoption List</span>
                     </a>
                 </nav>
-                <!-- Ítem de Cerrar Sesión -->
+
                 <a
                     :class="{'mt-auto': !menuBtn, 'mt-0': menuBtn}"
                     class="block font-semibold hover:text-white hover:font-medium py-2.5 px-4 my-2 rounded transition duration-200 hover:bg-gradient-to-r hover:from-main hover:to-main"
@@ -272,18 +273,18 @@ const deleteCat = async (id: number) => {
                     <Icon name="material-symbols:logout" class="icon text-3xl mr-2" />
                     <span>Logout</span>
                 </a>
-                <!-- Señalador de ubicación -->
+
                 <v-divider
                     :thickness="3"
                     class="border-opacity-25 max-w-96"
                 ></v-divider>
-                <!-- Copyright al final de la navegación lateral -->
+
                 <p class="mb-1 py-3 text-left text-xs text-main">Copyright CAP@2024</p>
             </div>
 
-            <!-- Área de contenido principal -->
+
             <div class="flex-1 p-4 w-full md:w-1/2 bg-[#fafbfc]">
-                <!-- Campo de búsqueda -->
+
                 <div class="relative max-w-md w-full">
                     <input class="w-full h-10 pl-10 pr-4 py-1 text-base placeholder-placeholder border rounded-full focus:shadow-outline" type="search" placeholder="Search...">
                 </div>
