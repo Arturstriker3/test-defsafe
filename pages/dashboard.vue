@@ -299,7 +299,7 @@ const getRandomCatNameService = async () => {
     if (getRandomNameLoading.value) return;
 
     getRandomNameLoading.value = true;
-    
+
     try {
         const response = await fetch(`https://tools.estevecastells.com/api/cats/v1?limit=1`, {
             method: 'GET',
@@ -307,15 +307,20 @@ const getRandomCatNameService = async () => {
 
         const result = await response.json();
         if (response.ok) {
-            const randomCatName = result.name;
-            newCatData.value.name = randomCatName;
-            useNuxtApp().$toast.success('Random cat name fetched successfully!');
+            const randomCatName = result[0];
+            if (randomCatName) {
+                newCatData.value.name = randomCatName;
+                useNuxtApp().$toast.success('Random cat name fetched successfully!');
+            } else {
+                useNuxtApp().$toast.error('No cat name found.');
+            }
         } else {
             console.error('Error fetching random cat name:', result.error);
             useNuxtApp().$toast.error('Error fetching random cat name. Please try again.');
         }
     } catch (error) {
         console.error('Error fetching random cat name:', error);
+        useNuxtApp().$toast.error('An unexpected error occurred. Please try again.');
     } finally {
         getRandomNameLoading.value = false;
     }
