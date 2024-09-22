@@ -1,7 +1,10 @@
 <script setup lang="ts">
 
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router';
+import EmailUtils from '@/utils/email.utils';
+import PhoneUtils from '@/utils/phone.utils';
+
 const router = useRouter()
 
 const notify = () => {
@@ -10,11 +13,37 @@ const notify = () => {
   // toast.info('toastify success');
 };
 
+const isMobile = ref(false);
+
+watch(() => window.innerWidth, (width) => {
+  if(width < 768) {
+    isMobile.value = true;
+  } else {
+    isMobile.value = false;
+  }
+});
+
+const isMobileCheck = (catId: number) => {
+  if (window.innerWidth < 768) {
+    isMobile.value = true;
+  }
+
+  handleAdoptCatGetById(catId)
+};
+
 const navigateAuth = () => {
     router.push('/login')
 }
 
+const isAdoptingCat = ref(false);
 const cats = ref<Cat[]>([]);
+
+const newGuardianData = ref<Guardian>({
+  fullName: '',
+  email: '',
+  telephone: '',
+  description: ''
+})
 
 export interface Cat {
     id: number;
@@ -24,6 +53,13 @@ export interface Cat {
     adopted?: boolean;
     createdAt?: Date;
     updatedAt?: Date;
+}
+
+export interface Guardian {
+  fullName: string;
+  email: string;
+  telephone: string;
+  description: string;
 }
 
 const fetchCats = async () => {
@@ -49,6 +85,98 @@ const fetchCats = async () => {
 onMounted(() => {
   fetchCats();
 });
+
+const handleNewGuardian = () => {
+  newGuardianData.value = {
+    fullName: '',
+    email: '',
+    telephone: '',
+    description: ''
+  }
+  isAdoptingCat.value = true;
+}
+
+const rulesGuardianName = [
+    (value: string) => !!value || 'You must enter your name.',
+]
+
+const rulesGuardianDescription = [
+    (value: string) => !!value || 'You have to explain why you would like to adopt this cat.',
+]
+
+const rulesGuardianEmail = [
+  (value: string) => !!value || 'You must enter your email.',
+  (value: string) => EmailUtils.isValid(value) || 'You must enter a valid email address.',
+]
+
+const rulesGuardianPhone = [
+  (value: string) => !!value || 'You must enter your telephone.',
+  (value: string) => {
+    const cleanedValue = value.replace(/\D/g, '');
+    return (/^(\d{2})(9\d{4})(\d{4})$/).test(cleanedValue) || '(XX)-9XXXX-XXXX';
+  },
+]
+
+const isNumber = (event: Event) => {
+  const input = event.target as HTMLInputElement;
+  const originalValue = input.value.replace(/\D/g, '');
+  const formattedValue = formatPhoneNumber(originalValue);
+  input.value = formattedValue;
+  newGuardianData.value.telephone = formattedValue;
+};
+
+const formatPhoneNumber = (value: string) => {
+  const numericValue = value.replace(/\D/g, '');
+  const limitedValue = numericValue.slice(0, 11);
+  const match = limitedValue.match(/^(\d{2})(\d{5})(\d{0,4})$/);
+  if (match) {
+    const formattedNumber = `(${match[1]}) ${match[2]}`;
+    if (match[3]) {
+      return `${formattedNumber}-${match[3]}`;
+    }
+    return formattedNumber;
+  }
+
+  return limitedValue;
+};
+
+const catIdToAdopt = ref(0);
+
+const handleAdoptCatGetById = (catId: number) => {
+  catIdToAdopt.value = catId;
+  handleNewGuardian();
+}
+
+const sendAdoptionForm = async (catId: number) => {
+
+  const cleanedTelephone = newGuardianData.value.telephone.replace(/\D/g, '');
+
+  const formattedGuardianData = {
+    ...newGuardianData.value,
+    phone: cleanedTelephone,
+    telephone: undefined
+  };
+
+  try {
+    const response = await fetch(`/api/adoptions/${catId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formattedGuardianData),
+    });
+
+    const result = await response.json();
+    if (response.ok) {
+      isAdoptingCat.value = false;
+      await fetchCats();
+    } else {
+      console.error('Erro ao enviar formulário de adoção:', result.error);
+    }
+  } catch (error) {
+    console.error('Erro ao enviar formulário de adoção:', error);
+  }
+};
 
 </script>
 
@@ -119,6 +247,7 @@ onMounted(() => {
                   color="main"
                   variant="flat"
                   text="Adopt"
+                  @click="isMobileCheck(cat.id)"
                   block
                 ></v-btn>
                 </div>
@@ -127,6 +256,107 @@ onMounted(() => {
             </div>
           </div>
         </div>
+        <v-dialog
+          v-model="isAdoptingCat"
+          max-width="400"
+          width="400"
+          :fullscreen="isMobile"
+        >
+          <v-card>
+            <v-card-title>
+                <div class="flex flex-row justify-between items-center" >
+                    <span class="font-semibold">
+                      Adoption Form
+                    </span>
+                    <div class="rounded-lg h-8 w-8 bg-[#b2f2e055] hover:bg-stroke flex justify-center items-center">
+                        <Icon name="mdi:heart" class="text-success text-2xl" />
+                    </div>
+                </div>
+            </v-card-title>
+
+            <v-divider
+                :thickness="2"
+                class="border-opacity-50"
+            ></v-divider>
+            
+            <div class="p-4" >
+                <v-form @submit.prevent>
+
+                    <span class="text-main font-semibold" >Name</span>
+                    <v-text-field
+                        v-model="newGuardianData.fullName"
+                        :rules="rulesGuardianName"
+                        placeholder="Enter your name"
+                        variant="outlined"
+                        class="mt-2 mb-1"
+                        :hint="newGuardianData.fullName.length + '/30'"
+                        maxlength="30"
+                        persistent-hint
+                    ></v-text-field>
+
+                    <span class="text-main font-semibold" >Email</span>
+                    <v-text-field
+                        v-model="newGuardianData.email"
+                        :rules="rulesGuardianEmail"
+                        placeholder="Enter your email"
+                        variant="outlined"
+                        class="mt-2 mb-1"
+                        :hint="'Must be like @domain.com'"
+                        maxlength="50"
+                        persistent-hint
+                    ></v-text-field>
+
+                    <span class="text-main font-semibold" >Telephone</span>
+                    <v-text-field
+                        v-model="newGuardianData.telephone"
+                        :rules="rulesGuardianPhone"
+                        placeholder="Enter your telephone"
+                        @input="isNumber"
+                        variant="outlined"
+                        class="mt-2 mb-1"
+                        :hint="'Type only numbers'"
+                        persistent-hint
+                    ></v-text-field>
+
+                    <span class="text-main font-semibold" >Why do you want to adopt this cat?</span>
+                    <v-textarea
+                        v-model="newGuardianData.description"
+                        placeholder="Write here..."
+                        row-height="25"
+                        rows="3"
+                        no-resize
+                        bg-color="white"
+                        variant="outlined"
+                        :hint="newGuardianData.description.length + '/100'"
+                        maxlength="100"
+                        persistent-hint
+                        :rules="rulesGuardianDescription"
+                        class="mt-2 mb-1"
+                    ></v-textarea>
+                </v-form>
+            </div>
+            
+
+            <template v-slot:actions>
+              <div class="flex gap-4 px-2 mb-2" >
+                <v-btn
+                    text="Cancel"
+                    @click="isAdoptingCat = false"
+                    color="stroke"
+                    variant="flat"
+                    width="100"
+                ></v-btn>
+                <v-btn
+                    text="Submit"
+                    @click="sendAdoptionForm(catIdToAdopt)"
+                    color="main"
+                    variant="flat"
+                    width="100"
+                ></v-btn>
+              </div>
+            </template>
+          </v-card>
+        </v-dialog>
     </div>
 </template>
 

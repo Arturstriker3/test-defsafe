@@ -116,7 +116,7 @@ const addNewCat = async () => {
 
         const result = await response.json();
         if (response.ok) {
-            fetchCats()
+            await fetchCats();
             newCatData.value = { name: '', description: '', imageBase64: '' };
             isCreatingNewCat.value = false;
         } else {
@@ -178,7 +178,7 @@ const updateCat = async (id: number, catNewName: string, catNewDescription: stri
             const errorData = await response.json();
             throw new Error(`Error updating cat: ${errorData.error}`);
         } else {
-            fetchCats()
+            await fetchCats();
             isEditingCat.value = false;
         }
     } catch (error) {
@@ -207,7 +207,7 @@ const deleteCat = async (id: number) => {
             const errorData = await response.json();
             throw new Error(`Error deleting cat: ${errorData.error}`);
         } else {
-            fetchCats()
+            await fetchCats();
             isDeletingCat.value = false;
         }
     } catch (error) {
@@ -259,7 +259,7 @@ const deleteCat = async (id: number) => {
                     </a>
                     <a @click.prevent="navigateHome" class="menu-item block hover:text-white font-medium py-2.5 px-4 my-4 rounded transition duration-200 hover:bg-gradient-to-r hover:from-main hover:to-main" href="#">
                         <Icon name="mdi:pets" class="icon text-4xl mr-2" />
-                        <span>Adoption</span>
+                        <span>Adoption List</span>
                     </a>
                 </nav>
                 <!-- Ítem de Cerrar Sesión -->
