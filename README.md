@@ -2,22 +2,7 @@
 
 ### Vue/Typescript/Tailwind:
  
- Esse repositório tem como foco aumentar a velocidade para produção de aplicações Front End ou Full Stack já tendo arquitetura de pastas, utils e libs/packages modernos que utilizo diariamente.
-
-## Clonar Repositório
-```
-git clone #### NovoProjeto
-```
-
-## Remover Referência Original
-```
-rm -rf .git
-```
-
-## Inicializar um novo repositório Git:
-```
-git init
-```
+ Teste técnico defsafe Nuxt / Typescript / Tailwind / PrismaOrm.
 
 ## Setup
 
@@ -33,18 +18,16 @@ Start the development server on `http://localhost:3000`:
 # npm
 npm run dev
 
-## Production
-
-Build the application for production:
-
-```bash
-# npm
-npm run build
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
 Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+
+**Identidade Visual**
+<div align="center">
+<img src="https://github.com/user-attachments/assets/de52ddb1-d618-43be-91e8-328acfd3b26e" width="auto" height="auto" />
+</div>
+<br/>
+<div align="center">
+<img src="https://github.com/user-attachments/assets/de52ddb1-d618-43be-91e8-328acfd3b26e" width="auto" height="auto" />
+</div>
+<div align="center">
+<img src="https://github.com/user-attachments/assets/de52ddb1-d618-43be-91e8-328acfd3b26e" width="auto" height="auto" />
+</div>
