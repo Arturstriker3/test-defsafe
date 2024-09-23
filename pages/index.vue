@@ -187,6 +187,19 @@ const sendAdoptionForm = async (catId: number) => {
 
 const adoptionConfirmModal = ref(false);
 
+const isFormValid = ref(false);
+
+watch(
+  [() => newGuardianData.value.fullName, () => newGuardianData.value.email, () => newGuardianData.value.telephone, () => newGuardianData.value.description],
+  () => {
+    isFormValid.value =
+      rulesGuardianName.every(rule => rule(newGuardianData.value.fullName) === true) &&
+      rulesGuardianEmail.every(rule => rule(newGuardianData.value.email) === true) &&
+      rulesGuardianPhone.every(rule => rule(newGuardianData.value.telephone) === true) &&
+      rulesGuardianDescription.every(rule => rule(newGuardianData.value.description) === true);
+  },
+  { immediate: true }
+);
 
 </script>
 
@@ -299,7 +312,7 @@ const adoptionConfirmModal = ref(false);
             <v-btn text="Cancel" @click="isAdoptingCatModal = false" color="stroke" variant="flat" width="100"
               :disabled="isLoadingView || isAdoptingCat"></v-btn>
             <v-btn text="Submit" @click="sendAdoptionForm(catIdToAdopt)" color="main" width="100" variant="flat"
-              :disabled="isLoadingView || isAdoptingCat"></v-btn>
+              :disabled="!isFormValid || isLoadingView || isAdoptingCat" :loading="isAdoptingCat"></v-btn>
           </div>
         </template>
       </v-card>

@@ -326,6 +326,20 @@ const getRandomCatNameService = async () => {
     }
 };
 
+const isFormValid = ref(false);
+const isImageBase64Present = (value: string) => !!value;
+
+watch(
+    [() => newCatData.value.name, () => newCatData.value.description, () => newCatData.value.imageBase64],
+    () => {
+        isFormValid.value =
+            rulesCatname.every(rule => rule(newCatData.value.name) === true) &&
+            rulesCatDescription.every(rule => rule(newCatData.value.description) === true) &&
+            isImageBase64Present(newCatData.value.imageBase64);
+    },
+    { immediate: true }
+);
+
 </script>
 
 <template>
@@ -513,13 +527,11 @@ const getRandomCatNameService = async () => {
                         :disabled="isLoadingView || isActionLoading"></v-textarea>
                 </v-form>
             </div>
-
-
             <template v-slot:actions>
                 <v-btn text="Cancel" @click="isCreatingNewCat = false" color="stroke" variant="flat" width="100"
                     :disabled="isLoadingView || isActionLoading"></v-btn>
                 <v-btn text="Save" @click="addNewCat()" color="main" variant="flat" width="100"
-                    :disabled="isLoadingView || isActionLoading"></v-btn>
+                    :disabled="!isFormValid || isLoadingView || isActionLoading" :loading="isActionLoading"></v-btn>
             </template>
         </v-card>
     </v-dialog>
@@ -556,15 +568,13 @@ const getRandomCatNameService = async () => {
                 <v-btn text="Cancel" @click="isEditingCat = false" color="stroke" variant="flat" width="100"
                     :disabled="isLoadingView || isActionLoading"></v-btn>
                 <v-btn text="Save" @click="updateCat(catEditData.id, catEditData.name, catEditData.description)"
-                    color="main" variant="flat" width="100" :disabled="isLoadingView || isActionLoading"></v-btn>
+                    color="main" variant="flat" width="100" :disabled="isLoadingView || isActionLoading"
+                    :loading="isActionLoading"></v-btn>
             </template>
         </v-card>
     </v-dialog>
     <v-dialog v-model="isDeletingCat" max-width="400" width="400">
         <v-card>
-
-
-
             <v-card-title>
                 <div class="flex flex-row justify-between items-center">
                     <span class="font-semibold">
@@ -575,7 +585,6 @@ const getRandomCatNameService = async () => {
                     </div>
                 </div>
             </v-card-title>
-
             <v-divider :thickness="2" class="border-opacity-50"></v-divider>
             <v-card-text>
                 <span class="">Are you sure that you want to delete this cat's profile? This action cannot be
@@ -585,7 +594,7 @@ const getRandomCatNameService = async () => {
                 <v-btn text="Cancel" @click="isDeletingCat = false" color="stroke" variant="flat" width="100"
                     :disabled="isLoadingView || isActionLoading"></v-btn>
                 <v-btn text="Delete" @click="deleteCat(catIdToDelete)" color="danger" variant="flat" width="100"
-                    :disabled="isLoadingView || isActionLoading"></v-btn>
+                    :disabled="isLoadingView || isActionLoading" :loading="isActionLoading"></v-btn>
             </template>
         </v-card>
     </v-dialog>
